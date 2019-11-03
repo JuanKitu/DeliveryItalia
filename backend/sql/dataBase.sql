@@ -44,7 +44,6 @@ CREATE TABLE personas(
 
 CREATE TABLE calles(
     idCalle serial NOT NULL,
-    apodos VARCHAR(100),
     nombreFormal VARCHAR(100) NOT NULL,
     idNombreCalle iNT NOT NULL,
     PRIMARY KEY(idCalle),
@@ -77,7 +76,7 @@ CREATE TABLE domicilioPertCalle(
     FOREIGN kEY(idDomicilio) REFERENCES domicilios
 );
 
-CREATE TABLE clienteEnDOmicilios(
+CREATE TABLE clienteEnDomicilios(
     --que cliente se encuentra en que domicilio
     idCliente int NOT NULL,
     idDomicilio INT,
@@ -88,7 +87,7 @@ CREATE TABLE clienteEnDOmicilios(
 
 CREATE TABLE potes(
     idPote serial,
-    cantidad int NOT NULL,
+    cantidad REAL,
     PRIMARY KEY(idPote)
 );
 
@@ -103,15 +102,14 @@ CREATE TABLE gustosEnPotes(
 
 CREATE TABLE pedidos (
     idPedido serial not null,
-    fechaPedido DATE not null,
-    horaPedido TIME,
+    fechaPedido TIMESTAMP WITH TIME ZONE not null,
     montoTotal real not null,
     montoPagaCliente real not null,
     cuit int,
     idDomicilio INT,
     idCliente INT,
-    descripcion TEXT,
     idSucursal INT,
+    descripcion TEXT,
     FOREIGN KEY(idCliente) REFERENCES clientes,
     FOREIGN KEY(idDomicilio) REFERENCES domicilios,
     FOREIGN KEY(idSucursal) REFERENCES sucursales,
@@ -119,14 +117,14 @@ CREATE TABLE pedidos (
 );
 
 CREATE TABLE itemPedido(
-    id serial NOT NULL,
+    idItemPedido serial NOT NULL,
+    idPedido int NOT NULL,
     precioTotal real NOT NULL,
     cantidad int NOT NULL,
     idPote int NOT NULL,
     idProducto int NOT NULL,
-    idPedido int NOT NULL,
     descripcion TEXT,
-    PRIMARY KEY(id, idPedido),
+    PRIMARY KEY(idItemPedido, idPedido),
     FOREIGN KEY(idPote) REFERENCES potes,
     FOREIGN KEY(idProducto) REFERENCES producto,
     FOREIGN KEY(idPedido) REFERENCES pedidos
@@ -135,8 +133,8 @@ CREATE TABLE itemPedido(
 CREATE TABLE estadoPedido(
     idEstado serial NOT NULL,
     nombre VARCHAR(50) NOT NULL,
-    fechaInicioEstado timestamp NOT NULL,
-    fechaFinEstado timestamp NOT NULL,
+    fechaInicioEstado TIMESTAMP WITH TIME ZONE NOT NULL,
+    fechaFinEstado TIMESTAMP WITH TIME ZONE NOT NULL,
     descripcion TEXT,
     idPedido int NOT NULL,
     PRIMARY KEY(idEstado, idPedido),

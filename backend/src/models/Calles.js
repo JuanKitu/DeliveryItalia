@@ -1,10 +1,10 @@
 const Sequelize = require('sequelize');
-const sequilize = require('../database/database.js');
+const {sequelize} = require('../database/database.js');
 const Apodos = require('./Apodos');
 const Domicilios = require('./Domicilios');
 const DomicilioPertCalle = require('./DomicilioPertCalle');
 
-const Calles = sequilize.define('calles',{
+const Calles = sequelize.define('calles',{
     idCalle:{
         type:Sequelize.INTEGER,
         primaryKey:true
@@ -24,4 +24,4 @@ Apodos.beLongsTo(Calles,{foreingKey:idNombreCalle, sourceKey: idNombreCalle});
 
 /*--- cardinality with Domicilio ---*/
 Calles.belongsToMany(Domicilios,{through: 'DomicilioPertCalle', foreignKey: 'idCalle', as: 'Domicilios'})
-export default Calles;
+module.exports = Calles;

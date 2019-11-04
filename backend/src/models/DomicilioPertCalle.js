@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
-const sequilize = require('../database/database.js');
+const {sequelize} = require('../database/database.js');
 
-const DomicilioPertCalle = sequilize.define('domicilioPertCalle',{
+const DomicilioPertCalle = sequelize.define('domicilioPertCalle',{
     idCalle:{
         type:Sequelize.INTEGER,
         primaryKey:true
@@ -13,4 +13,4 @@ const DomicilioPertCalle = sequilize.define('domicilioPertCalle',{
 },{
     timestamps: false
 });
-export default DomicilioPertCalle;
+module.exports = DomicilioPertCalle;

@@ -1,9 +1,9 @@
 const Sequelize = require('sequelize');
-const sequilize = require('../database/database.js');
+const {sequelize} = require('../database/database.js');
 const ItemPedido = require('./ItemPedido');
 const EstadoPedido = require('./EstadoPedido');
 
-const Pedidos = sequilize.define('pedidos',{
+const Pedidos = sequelize.define('pedidos',{
     idPedido:{
         type:Sequelize.INTEGER,
         primaryKey:true
@@ -42,4 +42,4 @@ ItemPedido.beLongsTo(Pedidos,{foreingKey:'idPedido',sourceKey:'idPedido'});
 /*--- Composition with EstadoPedido ---*/
 Pedidos.hasMany(EstadoPedido,{foreingKey:'idPedido',sourceKey:'idPedido'});
 EstadoPedido.beLongsTo(Pedidos,{foreingKey:'idPedido',sourceKey:'idPedido'});
-export default Pedidos;
+module.exports = Pedidos;

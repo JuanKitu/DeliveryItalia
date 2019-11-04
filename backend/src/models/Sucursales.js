@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
-const sequilize = require('../database/database.js');
+const {sequelize} = require('../database/database.js');
 const Pedidos = require('./Pedidos');
 
-const Sucursales = sequilize.define('sucursales',{
+const Sucursales = sequelize.define('sucursales',{
     idSucursal:{
         type:Sequelize.INTEGER,
         primaryKey:true
@@ -19,4 +19,4 @@ const Sucursales = sequilize.define('sucursales',{
 /*--- cardinaly with Pedidos ---*/
 Sucursales.hasMany(Pedidos,{foreingKey:'idSucursal',sourceKey:'idSucursal'});
 Pedidos.beLongsTo(Sucursales,{foreingKey:'idSucursal',sourceKey:'idSucursal'});
-export default Sucursales;
+module.exports = Sucursales;

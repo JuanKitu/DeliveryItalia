@@ -1,9 +1,9 @@
 const Sequelize = require('sequelize');
-const sequilize = require('../database/database.js');
+const {sequelize} = require('../database/database.js');
 const Gustos = require('./Gustos');
 
 
-const CategoriaGusto = sequilize.define('categoriaGusto',{
+const CategoriaGusto = sequelize.define('categoriaGusto',{
     idCategoria:{
         type:Sequelize.INTEGER,
         primaryKey:true
@@ -20,4 +20,4 @@ Gustos.beLongsTo(CategoriaGusto,{foreingKey:idCategoria,sourceKey:idCategoria});
 
 
 
-export default CategoriaGusto;
+module.exports = CategoriaGusto;

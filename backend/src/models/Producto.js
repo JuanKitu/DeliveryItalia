@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
-const sequilize = require('../database/database.js');
+const {sequelize} = require('../database/database.js');
 const ItemPedido = require('./ItemPedido');
 
-const Producto = sequilize.define('producto',{
+const Producto = sequelize.define('producto',{
     idProducto:{
         type: Sequelize.INTEGER,
         primaryKey:true
@@ -14,7 +14,7 @@ const Producto = sequilize.define('producto',{
         type:Sequelize.TEXT
     },
     precios:{
-        tipe:Sequelize.REAL
+        type:Sequelize.REAL
     }
 },{
     timestamps: false
@@ -22,4 +22,4 @@ const Producto = sequilize.define('producto',{
 /*--- cardinaly ItemPedido ---*/
 Producto.hasMany(ItemPedido,{foreingKey:'idProducto',sourceKey:'idProducto'});
 ItemPedido.beLongsTo(Producto,{foreingKey:'idProducto',sourceKey:'idProducto'});
-export default Producto;
+module.exports = Producto;

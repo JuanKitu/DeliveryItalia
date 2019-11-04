@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
-const sequilize = require('../database/database.js');
+const {sequelize} = require('../database/database.js');
 
-const ClienteEnDomicilio = sequilize.define('clienteEnDomicilio',{
+const ClienteEnDomicilio = sequelize.define('clienteEnDomicilio',{
     idCliente:{
         type:Sequelize.INTEGER,
         primaryKey:true
@@ -13,4 +13,4 @@ const ClienteEnDomicilio = sequilize.define('clienteEnDomicilio',{
 },{
     timestamps: false
 });
-export default ClienteEnDomicilio;
+module.exports = ClienteEnDomicilio;

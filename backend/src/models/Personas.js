@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
-const sequilize = require('../database/database.js');
+const {sequelize} = require('../database/database.js');
 const Clientes = require('./Clientes');
 
-const Personas = sequilize.define('personas',{
+const Personas = sequelize.define('personas',{
     dni:{
         type:Sequelize.INTEGER,
         primaryKey:true
@@ -18,5 +18,5 @@ const Personas = sequilize.define('personas',{
 });
 /*--- cardinality with Clientes ---*/
 Personas.hasMany(Clientes,{foreingKey:dni, sourceKey:dni});
-Clientes.beLongsTo(Personas,,{foreingKey:dni, sourceKey:dni});
-export default Personas;
+Clientes.beLongsTo(Personas,{foreingKey:dni, sourceKey:dni});
+module.exports = Personas;

@@ -1,5 +1,7 @@
 const Sequelize = require('sequelize');
 const sequilize = require('../database/database.js');
+const Potes = require('./Potes');
+const GustosEnPotes = require('./GustosEnPotes');
 
 const Gustos = sequilize.define('gustos',{
     idGusto:{
@@ -21,4 +23,7 @@ const Gustos = sequilize.define('gustos',{
 },{
     timestamps: false
 });
+/*--- cardinaly with Pote ---*/
+Gustos.beLongsToMany(Potes,{through:'GustosEnPotes',foreingKey:'idGusto', as:'Potes'});
+
 export default Gustos;

@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const sequilize = require('../database/database.js');
+const Pedidos = require('./Pedidos');
 
 const Sucursales = sequilize.define('sucursales',{
     idSucursal:{
@@ -15,4 +16,7 @@ const Sucursales = sequilize.define('sucursales',{
 },{
     timestamps: false
 });
+/*--- cardinaly with Pedidos ---*/
+Sucursales.hasMany(Pedidos,{foreingKey:'idSucursal',sourceKey:'idSucursal'});
+Pedidos.beLongsTo(Sucursales,{foreingKey:'idSucursal',sourceKey:'idSucursal'});
 export default Sucursales;

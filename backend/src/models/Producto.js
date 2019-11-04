@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const sequilize = require('../database/database.js');
+const ItemPedido = require('./ItemPedido');
 
 const Producto = sequilize.define('producto',{
     idProducto:{
@@ -18,4 +19,7 @@ const Producto = sequilize.define('producto',{
 },{
     timestamps: false
 });
+/*--- cardinaly ItemPedido ---*/
+Producto.hasMany(ItemPedido,{foreingKey:'idProducto',sourceKey:'idProducto'});
+ItemPedido.beLongsTo(Producto,{foreingKey:'idProducto',sourceKey:'idProducto'});
 export default Producto;

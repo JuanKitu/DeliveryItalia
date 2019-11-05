@@ -3,7 +3,7 @@ CREATE TABLE apodos (
     "nombreCalle" VARCHAR(100) NOT NULL,
     PRIMARY KEY("idNombreCalle")
 );
-
+-- si no se pone las "" pgadmin toma automaticamente la cadena de texto totalmente en minusculas
 CREATE TABLE producto(
     "idProducto" serial NOT NULL,
     nombre VARCHAR(100) NOT NULL,

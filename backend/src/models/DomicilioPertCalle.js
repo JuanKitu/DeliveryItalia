@@ -11,6 +11,7 @@ const DomicilioPertCalle = sequelize.define('domicilioPertCalle',{
         primaryKey:true
     }
 },{
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 module.exports = DomicilioPertCalle;

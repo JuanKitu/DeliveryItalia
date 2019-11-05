@@ -14,9 +14,10 @@ const Sucursales = sequelize.define('sucursales',{
         type:Sequelize.STRING(100)
     }
 },{
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- cardinaly with Pedidos ---*/
 Sucursales.hasMany(Pedidos,{foreingKey:'idSucursal',sourceKey:'idSucursal'});
-Pedidos.beLongsTo(Sucursales,{foreingKey:'idSucursal',sourceKey:'idSucursal'});
+Pedidos.belongsTo(Sucursales,{foreingKey:'idSucursal',sourceKey:'idSucursal'});
 module.exports = Sucursales;

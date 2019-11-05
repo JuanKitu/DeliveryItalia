@@ -16,11 +16,12 @@ const Calles = sequelize.define('calles',{
         type:Sequelize.INTEGER
     }
 },{
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- cardinality with Apodos ---*/
 Calles.hasMany(Apodos,{foreingKey:idNombreCalle, sourceKey: idNombreCalle});
-Apodos.beLongsTo(Calles,{foreingKey:idNombreCalle, sourceKey: idNombreCalle});
+Apodos.belongsTo(Calles,{foreingKey:idNombreCalle, sourceKey: idNombreCalle});
 
 /*--- cardinality with Domicilio ---*/
 Calles.belongsToMany(Domicilios,{through: 'DomicilioPertCalle', foreignKey: 'idCalle', as: 'Domicilios'})

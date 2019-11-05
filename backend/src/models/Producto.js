@@ -17,9 +17,10 @@ const Producto = sequelize.define('producto',{
         type:Sequelize.REAL
     }
 },{
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- cardinaly ItemPedido ---*/
 Producto.hasMany(ItemPedido,{foreingKey:'idProducto',sourceKey:'idProducto'});
-ItemPedido.beLongsTo(Producto,{foreingKey:'idProducto',sourceKey:'idProducto'});
+ItemPedido.belongsTo(Producto,{foreingKey:'idProducto',sourceKey:'idProducto'});
 module.exports = Producto;

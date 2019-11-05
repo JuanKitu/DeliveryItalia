@@ -21,9 +21,10 @@ const Gustos = sequelize.define('gustos',{
         type:Sequelize.INTEGER
     }
 },{
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- cardinaly with Pote ---*/
-Gustos.beLongsToMany(Potes,{through:'GustosEnPotes',foreingKey:'idGusto', as:'Potes'});
+Gustos.belongsToMany(Potes,{through:'GustosEnPotes',foreingKey:'idGusto', as:'Potes'});
 
 module.exports = Gustos;

@@ -34,12 +34,13 @@ const Pedidos = sequelize.define('pedidos',{
     }
 
 },{
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- Composition with ItemPedido ---*/
 Pedidos.hasMany(ItemPedido,{foreingKey:'idPedido',sourceKey:'idPedido'});
-ItemPedido.beLongsTo(Pedidos,{foreingKey:'idPedido',sourceKey:'idPedido'});
+ItemPedido.belongsTo(Pedidos,{foreingKey:'idPedido',sourceKey:'idPedido'});
 /*--- Composition with EstadoPedido ---*/
 Pedidos.hasMany(EstadoPedido,{foreingKey:'idPedido',sourceKey:'idPedido'});
-EstadoPedido.beLongsTo(Pedidos,{foreingKey:'idPedido',sourceKey:'idPedido'});
+EstadoPedido.belongsTo(Pedidos,{foreingKey:'idPedido',sourceKey:'idPedido'});
 module.exports = Pedidos;

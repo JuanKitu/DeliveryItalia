@@ -10,7 +10,8 @@ const Apodos = sequelize.define('apodos',{
         type:Sequelize.STRING(100)
     }
 },{
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 
 module.exports = Apodos;

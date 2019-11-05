@@ -13,13 +13,14 @@ const Clientes = sequelize.define('clientes',{
         type:Sequelize.INTEGER
     }
 },{
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 
 /*--- cardinality with Domicilios ---*/
 Clientes.belongsToMany(Domicilios,{through: 'ClienteEnDomicilios', foreignKey: 'idCliente', as: 'Domicilios'});
 /*--- cardinality with Domicilios ---*/
 Clientes.hasMany(Pedidos,{foreingKey:idCliente,sourceKey:idCliente});
-Pedidos.beLongsTo(Clientes,{foreingKey:idCliente,sourceKey:idCliente});
+Pedidos.belongsTo(Clientes,{foreingKey:idCliente,sourceKey:idCliente});
 
 module.exports = Clientes;

@@ -14,9 +14,10 @@ const Personas = sequelize.define('personas',{
         type:Sequelize.STRING(50)
     }
 },{
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- cardinality with Clientes ---*/
 Personas.hasMany(Clientes,{foreingKey:dni, sourceKey:dni});
-Clientes.beLongsTo(Personas,{foreingKey:dni, sourceKey:dni});
+Clientes.belongsTo(Personas,{foreingKey:dni, sourceKey:dni});
 module.exports = Personas;

@@ -13,11 +13,12 @@ const Potes = sequelize.define('potes',{
         type:Sequelize.REAL,
     }
 },{
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- cardinaly with Gustos ---*/
-Potes.beLongsToMany(Gustos,{through:'GustosEnPotes',foreingKey:'idPote',as:'Gustos'});
+Potes.belongsToMany(Gustos,{through:'GustosEnPotes',foreingKey:'idPote',as:'Gustos'});
 /*--- cardinaly with ItemPedido ---*/
 Potes.hasMany(ItemPedido,{foreingKey:'idPote',sourceKey:'idPote'});
-ItemPedido.beLongsTo(Potes,{foreingKey:'idPote',sourceKey:'idPote'});
+ItemPedido.belongsTo(Potes,{foreingKey:'idPote',sourceKey:'idPote'});
 module.exports = Potes;

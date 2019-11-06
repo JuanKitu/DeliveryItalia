@@ -13,7 +13,7 @@ const Producto = sequelize.define('producto',{
     descripcion:{
         type:Sequelize.TEXT
     },
-    precios:{
+    precio:{
         type:Sequelize.REAL
     }
 },{

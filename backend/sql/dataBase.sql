@@ -8,7 +8,7 @@ CREATE TABLE producto(
     "idProducto" serial NOT NULL,
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
-    precios real NOT NULL,
+    precio real NOT NULL,
     PRIMARY KEY("idProducto")
 );
 

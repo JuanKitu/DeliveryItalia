@@ -4,14 +4,14 @@ Producto = require('../models/Producto.js');
 
 /*--- Create a product ---*/
 controller.new = async (req, res) => {
-    const { nombre, descripcion, precios } = req.body;
+    const { nombre, descripcion, precio } = req.body;
     try {
         const newProducto = await Producto.create({
             nombre,
             descripcion,
-            precios
+            precio
         }, {
-            fields: ['nombre', 'descripcion', 'precios']
+            fields: ['nombre', 'descripcion', 'precio']
         });
         if (newProducto) {
             return res.json({
@@ -46,11 +46,11 @@ controller.getAll = async (req, res) => {
 controller.change = async (req, res) => {
     try{
         const {idProducto} = req.params;
-        const {nombre,descripcion,precios} = req.body;
+        const {nombre,descripcion,precio} = req.body;
         const newProducto = await Producto.update({
             nombre,
             descripcion,
-            precios
+            precio
         },
         {
             where: {
@@ -58,7 +58,7 @@ controller.change = async (req, res) => {
             }
         });
         const producto = await Producto.findOne({
-            attributes:['idProducto','nombre','descripcion','precios'],
+            attributes:['idProducto','nombre','descripcion','precio'],
             where:{
                 idProducto
             }
@@ -108,7 +108,7 @@ controller.getById = async (req, res) => {
             where: {
                 idProducto
             },
-            attributes: ['idProducto', 'nombre', 'descripcion', 'precios']
+            attributes: ['idProducto', 'nombre', 'descripcion', 'precio']
         });
         return res.json({
             data:aProducto

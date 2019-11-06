@@ -18,7 +18,10 @@ const Clientes = sequelize.define('clientes',{
 });
 
 /*--- cardinality with Domicilios ---*/
-Clientes.belongsToMany(Domicilios,{through: 'ClienteEnDomicilios', foreignKey: 'idCliente', as: 'Domicilios'});
+Clientes.associate = (models)=>{
+    Clientes.belongsToMany(models.Domicilios,{through: 'ClienteEnDomicilios', foreignKey: 'idCliente', as: 'Domicilios'});
+}
+
 /*--- cardinality with Domicilios ---*/
 Clientes.hasMany(Pedidos,{foreingKey:idCliente,sourceKey:idCliente});
 Pedidos.belongsTo(Clientes,{foreingKey:idCliente,sourceKey:idCliente});

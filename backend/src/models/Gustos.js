@@ -25,6 +25,9 @@ const Gustos = sequelize.define('gustos',{
     freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- cardinaly with Pote ---*/
-Gustos.belongsToMany(Potes,{through:'GustosEnPotes',foreingKey:'idGusto', as:'Potes'});
+Gustos.associate = (models) =>{
+    Gustos.belongsToMany(models.Potes,{through:'GustosEnPotes',foreingKey:'idGusto', as:'Potes'});
+};
+
 
 module.exports = Gustos;

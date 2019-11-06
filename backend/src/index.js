@@ -10,11 +10,13 @@ app.set('json spaces',2);
 app.set('port',3000);
 /*--- importing routes ---*/
 const productosRoutes = require('./routes/productos.js');
+const categoriaGustoRoutes = require('./routes/categoriaGusto.js')
 /*--- middleware ---*/
 app.use(morgan('dev'));
 app.use(json());
 /*--- Routes ---*/
 app.use('/api/productos',productosRoutes);
+app.use('/api/categoriagusto',categoriaGustoRoutes);
 /*--- Starup ---*/
 app.listen(app.get('port'),()=>{
     console.log(`Server on port: ${app.get('port')}`.magenta);

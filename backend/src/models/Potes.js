@@ -17,8 +17,13 @@ const Potes = sequelize.define('potes',{
     freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- cardinaly with Gustos ---*/
-Potes.belongsToMany(Gustos,{through:'GustosEnPotes',foreingKey:'idPote',as:'Gustos'});
+
+Potes.associate = (models) => {
+    Potes.belongsToMany(models.Gustos,{through:'GustosEnPotes',as:'Gustos',foreignKey:'idPote'});
+  };
+//Gustos.belongsToMany(Potes,{through:GustosEnPotes,foreingKey:'idGusto', as:'Potes'});
 /*--- cardinaly with ItemPedido ---*/
 Potes.hasMany(ItemPedido,{foreingKey:'idPote',sourceKey:'idPote'});
+
 ItemPedido.belongsTo(Potes,{foreingKey:'idPote',sourceKey:'idPote'});
 module.exports = Potes;

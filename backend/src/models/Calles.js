@@ -24,5 +24,7 @@ Calles.hasMany(Apodos,{foreingKey:idNombreCalle, sourceKey: idNombreCalle});
 Apodos.belongsTo(Calles,{foreingKey:idNombreCalle, sourceKey: idNombreCalle});
 
 /*--- cardinality with Domicilio ---*/
-Calles.belongsToMany(Domicilios,{through: 'DomicilioPertCalle', foreignKey: 'idCalle', as: 'Domicilios'})
+Calles.associate = (models)=>{
+    Calles.belongsToMany(models.Domicilios,{through: 'DomicilioPertCalle', foreignKey: 'idCalle', as: 'Domicilios'});
+};
 module.exports = Calles;

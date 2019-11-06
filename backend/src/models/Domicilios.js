@@ -26,11 +26,17 @@ const Domicilios = sequelize.define('domicilios',{
     timestamps: false,
     freezeTableName: true //this is so that sequelize does not pluralize the table
 });
-/*--- cardinality with Calle ---*/
-Domicilios.belongsToMany(Calles,{through: 'DomicilioPertCalle', foreignKey: 'idDomicilio', as: 'Calles'});
 
-/*--- cardinality with Clientes ---*/
-Domicilios.belongsToMany(Clientes,{through: 'ClienteEnDomicilios', foreignKey: 'idDomicilio', as: 'Clientes'});
+Domicilios.associate = (models)=>{
+    /*--- cardinality with Calle ---*/
+    Domicilios.belongsToMany(models.Calles,{through: 'DomicilioPertCalle', foreignKey: 'idDomicilio', as: 'Calles'});
+    /*--- cardinality with Clientes ---*/
+    Domicilios.belongsToMany(models.Clientes,{through: 'ClienteEnDomicilios', foreignKey: 'idDomicilio', as: 'Clientes'});
+};
+
+
+
+
 /*--- cardinality with Clientes ---*/
 Domicilios.HasMany(Pedidos,{foreignKey:idDomicilio,sourceKey:idDomicilio});
 Pedidos.belongsTo(Domicilios,{foreignKey:idDomicilio,sourceKey:idDomicilio});

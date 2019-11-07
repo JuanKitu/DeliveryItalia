@@ -1,5 +1,7 @@
 const controller = {};
 const Potes = require('../models/Potes.js');
+const GustosEnPotes = require('../models/GustosEnPotes');
+const Gustos = require('../models/Gustos.js');
 
 
 /*--- Create a pote ---*/
@@ -31,7 +33,7 @@ controller.new = async (req, res) => {
 controller.getAll = async (req, res) => {
     try {
         const pote = await Potes.findAll({
-            attributes:['idPote','tamanio','cantidad']
+            attributes:['idPote','tamanio','cantidad','cantidadMaxima']
         });
         return res.json({
             data: pote
@@ -47,10 +49,11 @@ controller.getAll = async (req, res) => {
 controller.change = async (req, res) => {
     try{
         const {idPote} = req.params;
-        const {tamanio,cantidad} = req.body;
+        const {tamanio,cantidad,cantidadMaxima} = req.body;
         const newPote = await Potes.update({
             tamanio,
-            cantidad
+            cantidad,
+            cantidadMaxima
         },
         {
             where: {
@@ -58,7 +61,7 @@ controller.change = async (req, res) => {
             }
         });
         const pote = await Potes.findOne({
-            attributes:['idPote','tamanio','cantidad'],
+            attributes:['idPote','tamanio','cantidad','cantidadMaxima'],
             where:{
                 idPote
             }
@@ -108,7 +111,7 @@ controller.getById = async (req, res) => {
             where: {
                 idPote
             },
-            attributes: ['idPote', 'tamanio','cantidad']
+            attributes: ['idPote', 'tamanio','cantidad','cantidadMaxima']
         });
         return res.json({
             data:pote
@@ -124,5 +127,70 @@ controller.getById = async (req, res) => {
     
 
 };
+controller.getGustos = async (req,res)=>{
+    try{
+        const {idPote} = req.params
+        const gustos = await GustosEnPotes.findAll({
+            where:{
+                idPote
+            }
+        });
+        return res.json({
+            data:gustos
+        });
+    }catch(error){
+        console.log(error);
+        return res.json({
+            error:'The server has been error',
+            data:{}
+        });
+    };
+};
+controller.addGusto = async (req,res)=>{
+    try{
+        const {idPote} = req.params;
+    const {idGusto} = req.body;
+    const pote = await Potes.findOne({
+        where:{
+            idPote
+        },
+        attributes:['idPote','cantidad','cantidadMaxima']
+    });
 
+    if(pote.cantidad<pote.cantidadMaxima){
+        const gustoSeleccionado = await Gustos.findOne({
+            where:{
+                idGusto
+            },
+            attributes:['idGusto']
+        });
+        console.log(gustoSeleccionado);
+        const newGustoEnPote = await GustosEnPotes.create({
+            idGusto,
+            idPote
+        })
+        const addCantidad = pote.cantidad+1;
+        await Potes.update({
+                cantidad:addCantidad,
+            },
+            {
+            where:{
+                idPote
+            }
+        })
+        return res.json({
+            message:'The gusto has been asignate by pote',
+            data: newGustoEnPote
+        })
+    }
+    }catch(error){
+        console.log(error);
+        return res.json({
+            error:'The server has been error',
+            data:{}
+        })
+    }
+
+
+}
 module.exports = controller;

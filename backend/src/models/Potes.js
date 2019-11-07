@@ -13,7 +13,10 @@ const Potes = sequelize.define('potes',{
         type:Sequelize.REAL,
     },
     cantidad:{
-        type:Sequelize.REAL,
+        type:Sequelize.INTEGER,
+    },
+    cantidadMaxima:{
+        type:Sequelize.INTEGER,
     }
 },{
     timestamps: false,

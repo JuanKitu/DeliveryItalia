@@ -88,7 +88,8 @@ CREATE TABLE "clienteEnDomicilios"(
 CREATE TABLE potes(
     "idPote" serial,
     tamanio REAL,
-    cantidad REAL,
+    cantidad INT DEFAULT 1,
+    "cantidadMaxima" INT,
     PRIMARY KEY("idPote")
 );
 
@@ -96,6 +97,7 @@ CREATE TABLE "gustosEnPotes"(
     --gusto de potes muchos a muchos(rel)
     "idPote" int NOT NULL,
     "idGusto" int NOT NULL,
+    "vecesUsado" INT DEFAULT 1,
     PRIMARY KEY("idPote", "idGusto"),
     FOREIGN KEY("idPote") REFERENCES potes,
     FOREIGN KEY("idGusto") REFERENCES gustos

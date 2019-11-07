@@ -87,6 +87,7 @@ CREATE TABLE "clienteEnDomicilios"(
 
 CREATE TABLE potes(
     "idPote" serial,
+    tamanio REAL,
     cantidad REAL,
     PRIMARY KEY("idPote")
 );

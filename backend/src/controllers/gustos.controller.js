@@ -5,7 +5,7 @@ const Gustos = require('../models/Gustos.js');
 controller.new = async (req, res) => {
     const { nombre, descripcion, disponible, idCategoria } = req.body;
     try {
-        const newGusto = await Gustos.create({
+        const newGusto = await Potes.create({
             nombre,
             descripcion,
             disponible,

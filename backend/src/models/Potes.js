@@ -9,6 +9,9 @@ const Potes = sequelize.define('potes',{
         type:Sequelize.INTEGER,
         primaryKey:true
     },
+    tamanio:{
+        type:Sequelize.REAL,
+    },
     cantidad:{
         type:Sequelize.REAL,
     }

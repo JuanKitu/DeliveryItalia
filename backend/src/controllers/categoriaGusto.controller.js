@@ -60,7 +60,7 @@ controller.change = async (req, res) => {
            
         });
         return res.json({
-            message:'The Producto has been updated',
+            message:'The CategoriaGusto has been updated',
             data:categoriaGusto
         });
     }catch(error){

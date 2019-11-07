@@ -146,6 +146,9 @@ controller.getGustos = async (req,res)=>{
         });
     };
 };
+
+
+/*--- FALTA VERIFICAR QUE SI SELECCIONA EL MISMO GUSTO, SE DEBE INCREMENTAR EL CONTADOR DE "VECESUSADO" ---*/
 controller.addGusto = async (req,res)=>{
     try{
         const {idPote} = req.params;
@@ -164,6 +167,7 @@ controller.addGusto = async (req,res)=>{
             },
             attributes:['idGusto']
         });
+        //HACER UN IF CON GUSTO Y POTE
         console.log(gustoSeleccionado);
         const newGustoEnPote = await GustosEnPotes.create({
             idGusto,

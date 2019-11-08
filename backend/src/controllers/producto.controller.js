@@ -169,8 +169,10 @@ controller.getImage = async                                                     
         },
         attributes:['idProducto','foto']
     })
-    const dir = producto.foto;
-    res.sendFile(__dirname + dir);
+    const dir = __dirname + producto.foto;
+    res.json({
+        foto:dir
+    })
 };
 
 

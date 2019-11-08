@@ -1,7 +1,6 @@
 const Sequelize = require('sequelize');
 const {sequelize} = require('../database/database.js');
 const ItemPedido = require('./ItemPedido');
-
 const Producto = sequelize.define('producto',{
     idProducto:{
         type: Sequelize.INTEGER,
@@ -15,11 +14,15 @@ const Producto = sequelize.define('producto',{
     },
     precio:{
         type:Sequelize.REAL
+    },
+    foto:{
+        type:Sequelize.STRING
     }
 },{
     timestamps: false,
     freezeTableName: true //this is so that sequelize does not pluralize the table
 });
+
 /*--- cardinaly ItemPedido ---*/
 Producto.hasMany(ItemPedido,{foreingKey:'idProducto',sourceKey:'idProducto'});
 ItemPedido.belongsTo(Producto,{foreingKey:'idProducto',sourceKey:'idProducto'});

@@ -9,6 +9,7 @@ CREATE TABLE producto(
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
     precio real NOT NULL,
+    foto BYTEA,
     PRIMARY KEY("idProducto")
 );
 

@@ -6,13 +6,14 @@ const Gustos = require('../models/Gustos.js');
 
 /*--- Create a pote ---*/
 controller.new = async (req, res) => {
-    const { cantidad, tamanio } = req.body;
+    const { cantidad, tamanio, cantidadMaxima } = req.body;
     try {
         const newPote = await Potes.create({
-            cantidad,
+            cantidad,// el valor por default debe ser 0
             tamanio,
+            cantidadMaxima
         }, {
-            fields: ['cantidad','tamanio']
+            fields: ['cantidad', 'tamanio', 'cantidadMaxima']
         });
         if (newPote) {
             return res.json({
@@ -33,7 +34,7 @@ controller.new = async (req, res) => {
 controller.getAll = async (req, res) => {
     try {
         const pote = await Potes.findAll({
-            attributes:['idPote','tamanio','cantidad','cantidadMaxima']
+            attributes: ['idPote', 'tamanio', 'cantidad', 'cantidadMaxima']
         });
         return res.json({
             data: pote
@@ -47,58 +48,58 @@ controller.getAll = async (req, res) => {
 };
 /*--- Edit a pote ---*/
 controller.change = async (req, res) => {
-    try{
-        const {idPote} = req.params;
-        const {tamanio,cantidad,cantidadMaxima} = req.body;
+    try {
+        const { idPote } = req.params;
+        const { tamanio, cantidad, cantidadMaxima } = req.body;
         const newPote = await Potes.update({
             tamanio,
             cantidad,
             cantidadMaxima
         },
-        {
+            {
+                where: {
+                    idPote
+                }
+            });
+        const pote = await Potes.findOne({
+            attributes: ['idPote', 'tamanio', 'cantidad', 'cantidadMaxima'],
             where: {
                 idPote
             }
-        });
-        const pote = await Potes.findOne({
-            attributes:['idPote','tamanio','cantidad','cantidadMaxima'],
-            where:{
-                idPote
-            }
-           
+
         });
         return res.json({
-            message:'The pote has been updated',
-            data:pote
+            message: 'The pote has been updated',
+            data: pote
         });
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return res.json({
-            error:'The server has been error',
-            data:{}
+            error: 'The server has been error',
+            data: {}
         });
     };
 
 };
 /*--- Delete a pote ---*/
 controller.delete = async (req, res) => {
-    try{
-        const {idPote} = req.params;
+    try {
+        const { idPote } = req.params;
         const deleteRowCount = await Potes.destroy({
-            where:{
+            where: {
                 idPote
             }
         });
         return res.json({
-            message:'The pote has been deleted',
-            count:deleteRowCount
+            message: 'The pote has been deleted',
+            count: deleteRowCount
         });
 
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return res.json({
-            error:'The server has been error',
-            data:{}
+            error: 'The server has been error',
+            data: {}
         });
     };
 
@@ -111,90 +112,224 @@ controller.getById = async (req, res) => {
             where: {
                 idPote
             },
-            attributes: ['idPote', 'tamanio','cantidad','cantidadMaxima']
+            attributes: ['idPote', 'tamanio', 'cantidad', 'cantidadMaxima']
         });
         return res.json({
-            data:pote
+            data: pote
         })
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return res.json({
-            error:'The server has been error',
-            data:{}
+            error: 'The server has been error',
+            data: {}
         });
 
     };
-    
+
 
 };
-controller.getGustos = async (req,res)=>{
-    try{
-        const {idPote} = req.params
-        const gustos = await GustosEnPotes.findAll({
-            where:{
+/*--- find gusto pote ---*/
+controller.getGustos = async (req, res) => {
+    try {
+        const { idPote } = req.params
+        const gustosEnPote = await GustosEnPotes.findAll({
+            where: {
                 idPote
             }
         });
+        const gusto = [];
+        for (let inc = 0; inc < gustosEnPote.length; inc++) {
+            const gustoAux = await Gustos.findOne({
+                where: {
+                    idGusto: gustosEnPote[inc].idGusto
+                },
+                attributes: ['idGusto', 'nombre', 'descripcion', 'disponible', 'idCategoria']
+            });
+            gusto.push(gustoAux);
+        }
         return res.json({
-            data:gustos
+            data: gusto
         });
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return res.json({
-            error:'The server has been error',
-            data:{}
+            error: 'The server has been error',
+            data: {}
         });
     };
 };
-
-
-/*--- FALTA VERIFICAR QUE SI SELECCIONA EL MISMO GUSTO, SE DEBE INCREMENTAR EL CONTADOR DE "VECESUSADO" ---*/
-controller.addGusto = async (req,res)=>{
-    try{
-        const {idPote} = req.params;
-    const {idGusto} = req.body;
-    const pote = await Potes.findOne({
-        where:{
-            idPote
-        },
-        attributes:['idPote','cantidad','cantidadMaxima']
-    });
-
-    if(pote.cantidad<pote.cantidadMaxima){
-        const gustoSeleccionado = await Gustos.findOne({
-            where:{
-                idGusto
-            },
-            attributes:['idGusto']
-        });
-        //HACER UN IF CON GUSTO Y POTE
-        console.log(gustoSeleccionado);
-        const newGustoEnPote = await GustosEnPotes.create({
-            idGusto,
-            idPote
-        })
-        const addCantidad = pote.cantidad+1;
-        await Potes.update({
-                cantidad:addCantidad,
-            },
-            {
-            where:{
+/*--- add gusto pote ---*/
+controller.addGusto = async (req, res) => {
+    try {
+        const { idPote } = req.params;
+        const { idGusto } = req.body;
+        const pote = await Potes.findOne({
+            where: {
                 idPote
+            },
+            attributes: ['idPote', 'cantidad', 'cantidadMaxima']
+        });
+
+        if (pote.cantidad <= pote.cantidadMaxima) {
+            const gustoSeleccionado = await Gustos.findOne({
+                where: {
+                    idGusto
+                },
+                attributes: ['idGusto']
+            });
+            const gustoEnPote = await GustosEnPotes.findOne({
+                where: {
+                    idGusto,
+                    idPote
+                },
+                attributes: ['idGusto', 'idPote', 'vecesUsado']
+            })
+            if (gustoEnPote !== null) {
+                const addVecesUsado = gustoEnPote.vecesUsado + 1;
+                await GustosEnPotes.update({
+                    vecesUsado: addVecesUsado,
+                },
+                    {
+                        where: {
+                            idGusto,
+                            idPote
+                        }
+                    }
+                )
+            } else {
+                const newGustoEnPote = await GustosEnPotes.create({
+                    idGusto,
+                    idPote,
+                    vecesUsado: 1
+                })
             }
-        })
-        return res.json({
-            message:'The gusto has been asignate by pote',
-            data: newGustoEnPote
-        })
-    }
-    }catch(error){
+            const addCantidad = pote.cantidad + 1;
+            await Potes.update({
+                cantidad: addCantidad,
+            },
+                {
+                    where: {
+                        idPote
+                    }
+                })
+            const consultaGustoEnPote = await GustosEnPotes.findOne({
+                where: {
+                    idGusto,
+                    idPote
+                },
+                attributes: ['idGusto', 'idPote', 'vecesUsado']
+            })
+            return res.json({
+                message: 'The gusto has been asignate by pote',
+                data: consultaGustoEnPote
+            })
+        }else {
+            return res.json({
+                message: 'the maximum amount of tastes has been reached',
+                data: []
+            })
+        }
+    } catch (error) {
         console.log(error);
         return res.json({
-            error:'The server has been error',
-            data:{}
+            error: 'The server has been error',
+            data: {}
         })
     }
 
 
 }
+/*--- delete gusto pote ---*/
+controller.deleteGusto = async (req, res) => {
+    try {
+        const { idPote } = req.params;
+        const { idGusto } = req.body;
+        const pote = await Potes.findOne({
+            where: {
+                idPote
+            },
+            attributes: ['idPote', 'cantidad', 'cantidadMaxima']
+        });
+
+        if (pote.cantidad <= pote.cantidadMaxima) {
+            const gustoSeleccionado = await Gustos.findOne({
+                where: {
+                    idGusto
+                },
+                attributes: ['idGusto']
+            });
+            const gustoEnPote = await GustosEnPotes.findOne({
+                where: {
+                    idGusto,
+                    idPote
+                },
+                attributes: ['idGusto', 'idPote', 'vecesUsado']
+            })
+            if (gustoEnPote !== null && gustoEnPote.vecesUsado > 1) {
+                const dissVecesUsado = gustoEnPote.vecesUsado - 1;
+                await GustosEnPotes.update({
+                    vecesUsado: dissVecesUsado,
+                },
+                    {
+                        where: {
+                            idGusto,
+                            idPote
+                        }
+                    }
+                )
+                const dissCantidad = pote.cantidad - 1;
+                await Potes.update({
+                    cantidad: dissCantidad,
+                },
+                    {
+                        where: {
+                            idPote
+                        }
+                    })
+            } else if (gustoEnPote !== null) {
+                GustosEnPotes.destroy({
+                    where: {
+                        idGusto,
+                        idPote
+                    }
+                })
+                const dissCantidad = pote.cantidad - 1;
+                await Potes.update({
+                    cantidad: dissCantidad,
+                },
+                    {
+                        where: {
+                            idPote
+                        }
+                    })
+            }
+            const consultaGustoEnPote = await GustosEnPotes.findOne({
+                where: {
+                    idGusto,
+                    idPote
+                },
+                attributes: ['idGusto', 'idPote', 'vecesUsado']
+            })
+            return res.json({
+                message: 'The gusto has been deleted by pote',
+                data: consultaGustoEnPote
+            })
+        } else {
+            return res.json({
+                message: 'There are no gustos to delete',
+                data: []
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error',
+            data: {}
+        })
+    }
+
+
+}
+
+
 module.exports = controller;

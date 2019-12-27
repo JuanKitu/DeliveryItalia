@@ -9,6 +9,9 @@ const GustosEnPotes = sequelize.define('gustosEnPotes',{
     idGusto:{
         type:Sequelize.INTEGER,
         primaryKey:true
+    },
+    vecesUsado:{
+        type:Sequelize.INTEGER
     }
 },{
     timestamps: false,

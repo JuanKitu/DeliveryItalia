@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Node Image Upload</title>
+    <!-- BOOTSTRAP 4 -->
+</head>
+<body>
+
+    <div class="container">
+        <form>
+            <input id="file_image" type="file" name="image">
+            <a id="btn_send_new_article">
+                Save
+            </a>
+        </form>
+    </div>
+<script type="text/javascript">
+
+    $('#btn_send_new_article').click(function () {
+    const data = new FormData();
+    data.append('image', $('#file_image')[0].files[$('#file_image')[0].files.length - 1]);
+    data.append('nombre','helado de Agua');
+    data.append('descripcion','Es muy delicioso y rico');
+    data.append('precio',150);
+    $.ajax({
+        url: '/api/productos',
+        method: 'POST',
+        data: data,
+        contentType: false,
+        processData: false
+    })
+        .done(() => console.log('list'));
+});
+</script>
+</body>
+</html>

@@ -2,12 +2,16 @@
 const express = require('express');
 const {json} =require('express');
 const morgan = require('morgan');
+const path = require('path');
 colors = require('colors');
 const app = express();
 
 /*--- Settings ---*/
+app.set('views', path.join(__dirname, 'views'));
 app.set('json spaces',2);
 app.set('port',3000);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 /*--- importing routes ---*/
 const productosRoutes = require('./routes/productos.js');
 const categoriaGustoRoutes = require('./routes/categoriaGusto.js')

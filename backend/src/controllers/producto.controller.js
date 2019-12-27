@@ -3,23 +3,21 @@ const multer = require('multer')
 const fs = require('fs');
 Producto = require('../models/Producto.js');
 /*--- Inicializando el Multer ---*/
-const storage =   multer.diskStorage({
-    destination: function (req, file, callback) {
-      fs.mkdir('./uploads', function(err) {
-          if(err) {
-              console.log(err.stack)
-          } else {
-              callback(null, './uploads');
-          }
-      })
+
+let fileName = '';
+let storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './src/public/images/product/');
     },
-    filename: function (req, file, callback) {
-      callback(null, file.fieldname + '-' + Date.now());
+    filename: function (req, file, cb) {
+        cb(null, fileName + '.png');
     }
-  });
+});
+let upload = multer({ storage: storage }).single('image');
 
 /*--- Create a product ---*/
 controller.new = async (req, res) => {
+    console.log(req.params);
     const { nombre, descripcion, precio } = req.body;
     try {
         const newProducto = await Producto.create({
@@ -29,6 +27,17 @@ controller.new = async (req, res) => {
         }, {
             fields: ['nombre', 'descripcion', 'precio']
         });
+
+        //Este bloque seria para subir una imagen de producto, todavia es una beta
+        fileName = newProducto.idProducto;
+        upload(req, res, async function (err) {
+            res.json({
+                success: true,
+                menssage: 'image upload!'
+            });
+        });
+        //termina el bloque
+
         if (newProducto) {
             return res.json({
                 message: 'The Productos has been created',
@@ -140,40 +149,5 @@ controller.getById = async (req, res) => {
 
 
 };
-
-controller.uploadImage = async (req,res)=>{
-    const idProducto = req.params;
-    const foto = multer({ storage : storage}).single('imagen');
-    foto(req,res, async function(err) {
-        if(err) {
-            return res.json({
-                message:'Error uploading file.'
-            });
-        }
-        await Producto.update({
-            imagen
-        },{
-            where:{
-                idProducto
-            }
-        })
-        res.end("File is uploaded");
-    });
-};
-
-controller.getImage = async                                                                                                                                (req,res)=>{
-    const idProducto = req.params;
-    const producto = await Producto.findOne({
-        where:{
-            idProducto
-        },
-        attributes:['idProducto','foto']
-    })
-    const dir = __dirname + producto.foto;
-    res.json({
-        foto:dir
-    })
-};
-
 
 module.exports = controller;

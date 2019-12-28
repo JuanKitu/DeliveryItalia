@@ -1,7 +1,9 @@
 const Sequelize = require('sequelize');
 const {sequelize} = require('../database/database.js');
+const Clientes = require('./Clientes');
+const Domicilios = require('./Domicilios');
 
-const ClienteEnDomicilio = sequelize.define('clienteEnDomicilio',{
+const ClienteEnDomicilios = sequelize.define('clienteEnDomicilios',{
     idCliente:{
         type:Sequelize.INTEGER,
         primaryKey:true,
@@ -20,4 +22,7 @@ const ClienteEnDomicilio = sequelize.define('clienteEnDomicilio',{
     timestamps: false,
     freezeTableName: true //this is so that sequelize does not pluralize the table
 });
-module.exports = ClienteEnDomicilio;
+
+//Clientes.hasMany(Domicilios,{through:'ClienteEnDomicilios'});
+//Domicilios.belongsToMany(Clientes,{through:'ClienteEnDomicilios'});
+module.exports = ClienteEnDomicilios;

@@ -85,14 +85,21 @@ controller.change = async (req, res) => {
 controller.delete = async (req, res) => {
     try {
         const { idPote } = req.params;
-        const deleteRowCount = await Potes.destroy({
+
+        const deleteRowCountGusto = await GustosEnPotes.destroy({
+            where: {
+                idPote
+            }
+        });
+        const deleteRowCountPote = await Potes.destroy({
             where: {
                 idPote
             }
         });
         return res.json({
             message: 'The pote has been deleted',
-            count: deleteRowCount
+            countPote: deleteRowCountPote,
+            countGusto: deleteRowCountGusto
         });
 
     } catch (error) {
@@ -159,6 +166,26 @@ controller.getGustos = async (req, res) => {
         });
     };
 };
+controller.getGustoEnPotes = async (req,res)=>{
+    const {idPote,idGusto}= req.params;
+    try{
+        const gustoEnPotes = await GustosEnPotes.findOne({
+            where:{
+                idPote,
+                idGusto
+            }
+        });
+        return res.json({
+            data:gustoEnPotes
+        });
+    }catch(error){
+        console.log(error);
+        return res.json({
+            error: 'The server has been error',
+            data: {}
+        })  
+    }
+}
 /*--- add gusto pote ---*/
 controller.addGusto = async (req, res) => {
     try {

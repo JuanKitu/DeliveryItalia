@@ -34,10 +34,10 @@ const Domicilios = sequelize.define('domicilios',{
     freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 
-Domicilios.associate = (models)=>{
-    /*--- cardinality with Clientes ---*/
-    Domicilios.belongsToMany(models.Clientes,{through: 'ClienteEnDomicilios', foreignKey: 'idDomicilio', as: 'Clientes'});
-};
+ Domicilios.associate = (models)=>{
+     /*--- cardinality with Clientes ---*/
+     Domicilios.belongsToMany(models.Clientes,{through: 'ClienteEnDomicilios', foreignKey: 'idDomicilio', as: 'Clientes'});
+ };
 
 
 

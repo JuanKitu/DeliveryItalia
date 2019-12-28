@@ -2,6 +2,7 @@ const Clientes = require('../models/Clientes.js');
 const Cuentas = require('../models/Cuentas.js');
 const ClienteEnDomicilios = require('../models/ClienteEnDomicilios.js');
 const Domicilios = require('../models/Domicilios.js');
+const Pedidos = require('../models/Pedidos.js');
 const controller = {};
 
 /*--- Create of cliente ---*/
@@ -78,14 +79,20 @@ controller.change = async (req, res) => {
 controller.delete = async (req, res) => {
     try {
         const { idCliente } = req.params;
-        const deleteRowCount = await Clientes.destroy({
+        const deleteRowCountDireccion = await ClienteEnDomicilios.destroy({
+            where:{
+                idCliente
+            }
+        });
+        const deleteRowCountClientes = await Clientes.destroy({
             where: {
                 idCliente
             }
         });
         return res.json({
             message: 'The Cliente has been deleted',
-            count: deleteRowCount
+            countClientes: deleteRowCountClientes,
+            countDireccion: deleteRowCountClientes
         });
 
     } catch (error) {
@@ -118,7 +125,7 @@ controller.getById = async (req, res) => {
 controller.getCuenta = async (req, res) => {
     const { idCliente } = req.params;
     try {
-        const cliente = await Cliente.findOne({
+        const cliente = await Clientes.findOne({
             where: {
                 idCliente
             }
@@ -141,6 +148,25 @@ controller.getCuenta = async (req, res) => {
         });
     }
 };
+/* Find all Pedido by Cliente */
+controller.getAllPedido = async (req,res)=>{
+    const {idCliente} = req.params;
+    try{
+        const pedidos = await Pedidos.findAll({
+            where:{
+                idCliente
+            }
+        });
+        return res.json({
+            data:pedidos
+        });
+    }catch(error){
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        }); 
+    }
+}
 /*--- Find domicilios by cliente ---*/
 controller.getDomicilios = async (req, res) => {
     const { idCliente } = req.params;
@@ -150,11 +176,18 @@ controller.getDomicilios = async (req, res) => {
                 idCliente
             }
         });
+        if(!clienteEnDomicilios){
+            return res.json({
+                data:[]
+            });
+        };
         const domicilios = [];
         for (let inc = 0; inc < clienteEnDomicilios.length; inc++) {
             const idDomicilio = clienteEnDomicilios[inc].idDomicilio;
             const domicilioAux = await Domicilios.findOne({
-                idDomicilio
+                where:{
+                    idDomicilio
+                }
             });
             domicilios.push(domicilioAux);
         };
@@ -169,22 +202,43 @@ controller.getDomicilios = async (req, res) => {
         });
     }
 };
-/*--- Add domicilio by cliente  ---*/
-controller.addDomicilio = async (req, res) => {
-    const { idCliente } = req.params;
-    const { idDomicilio, nombrePilaRemitente, dniRemitente } = req.body;
-    try {
+/*--- Find ClienteEnDomicilio ---*/
+controller.getClienteEnDomicilio = async (req,res)=>{
+    const {idCliente,idDomicilio}= req.params;
+    try{
         const clienteEnDomicilios = await ClienteEnDomicilios.findOne({
-            where: {
+            where:{
                 idCliente,
                 idDomicilio
             }
         });
-        if (clienteEnDomicilios) {
-            return res.json({
-                message: 'The object already exists'
-            })
-        }
+        return res.json({
+            data:clienteEnDomicilios
+        });
+    }catch(error){
+        console.log(error);
+        return res.json({
+            error: 'The server has been error',
+            data: {}
+        })  
+    }
+}
+/*--- Add domicilio by cliente  ---*/
+controller.addDomicilio = async (req, res) => {
+    const { idCliente } = req.params;
+    const { idDomicilio, nombrePilaDestinatario, dniDestinatario } = req.body;
+    try {
+        const clienteEnDomicilios = await ClienteEnDomicilios.findOne({
+             where: {
+                 idCliente,
+                 idDomicilio
+             }
+         });
+         if (clienteEnDomicilios) {
+             return res.json({
+                 message: 'The object already exists'
+             })
+         }
         const cliente = await Clientes.findOne({
             where: {
                 idCliente
@@ -197,11 +251,11 @@ controller.addDomicilio = async (req, res) => {
                 }
             });
             if (domicilio) {
-                const newClienteEnDomicilio = ClienteEnDomicilios.create({
+                const newClienteEnDomicilio = await ClienteEnDomicilios.create({
                     idDomicilio,
                     idCliente,
-                    nombrePilaRemitente,
-                    dniRemitente
+                    nombrePilaDestinatario, 
+                    dniDestinatario
                 });
                 return res.json({
                     message: 'The Cliente has been linked to the Domicilio',
@@ -231,11 +285,11 @@ controller.addDomicilio = async (req, res) => {
 /*--- Edit domicilio by cliente ---*/
 controller.changeDomicilio = async (req,res)=>{
     const { idCliente,idDomicilio } = req.params;
-    const { nombrePilaRemitente,dniRemitente } = req.body;
+    const { nombrePilaDestinatario, dniDestinatario } = req.body;
     try{
         await ClienteEnDomicilios.update({
-            nombrePilaRemitente,
-            dniRemitente
+            nombrePilaDestinatario, 
+            dniDestinatario
         },
         {
             where:{

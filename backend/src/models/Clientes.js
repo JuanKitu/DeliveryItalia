@@ -7,9 +7,19 @@ const Pedidos = require('./Pedidos');
 const Clientes = sequelize.define('clientes',{
     idCliente:{
         type:Sequelize.INTEGER,
-        primaryKey:true
+        primaryKey:true,
+        autoIncrement: true
     },
     dni:{
+        type:Sequelize.INTEGER
+    },
+    nombre:{
+        type:Sequelize.STRING(50)
+    },
+    apellido:{
+        type:Sequelize.STRING(50)
+    },
+    idCuenta:{
         type:Sequelize.INTEGER
     }
 },{

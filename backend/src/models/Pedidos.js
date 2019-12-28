@@ -6,7 +6,8 @@ const EstadoPedido = require('./EstadoPedido');
 const Pedidos = sequelize.define('pedidos',{
     idPedido:{
         type:Sequelize.INTEGER,
-        primaryKey:true
+        primaryKey:true,
+        autoIncrement: true
     },
     fechaPedido:{
         type:Sequelize.DATE

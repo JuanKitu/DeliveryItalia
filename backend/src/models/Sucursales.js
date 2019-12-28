@@ -5,7 +5,8 @@ const Pedidos = require('./Pedidos');
 const Sucursales = sequelize.define('sucursales',{
     idSucursal:{
         type:Sequelize.INTEGER,
-        primaryKey:true
+        primaryKey:true,
+        autoIncrement: true
     },
     numeroTelefono:{
         type:Sequelize.INTEGER

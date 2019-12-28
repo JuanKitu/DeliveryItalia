@@ -4,7 +4,8 @@ const ItemPedido = require('./ItemPedido');
 const Producto = sequelize.define('producto',{
     idProducto:{
         type: Sequelize.INTEGER,
-        primaryKey:true
+        primaryKey:true,
+        autoIncrement: true
     },
     nombre:{
         type: Sequelize.STRING(100)

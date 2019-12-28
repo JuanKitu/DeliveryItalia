@@ -8,7 +8,8 @@ const DomicilioPertCalle = require('./DomicilioPertCalle');
 const Calles = sequelize.define('calles', {
     idCalle: {
         type: Sequelize.INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
     },
     nombreFormal: {
         type: Sequelize.STRING(100)

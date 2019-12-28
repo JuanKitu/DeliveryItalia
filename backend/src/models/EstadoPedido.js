@@ -4,7 +4,8 @@ const {sequelize} = require('../database/database.js');
 const EstadoPedido = sequelize.define('estadoPedido',{
     idEstado:{
         type:Sequelize.INTEGER,
-        primaryKey:true
+        primaryKey:true,
+        autoIncrement: true
     },
     idPedido:{
         type:Sequelize.INTEGER,

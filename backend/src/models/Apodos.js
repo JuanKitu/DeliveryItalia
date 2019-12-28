@@ -5,6 +5,7 @@ const Apodos = sequelize.define('apodos',{
     idNombreCalle:{
         type: Sequelize.INTEGER,
         primaryKey:true,
+        autoIncrement: true
     },
     idCalle:{
         type:Sequelize.INTEGER,

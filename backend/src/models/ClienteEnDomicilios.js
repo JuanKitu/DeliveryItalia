@@ -4,7 +4,7 @@ const {sequelize} = require('../database/database.js');
 const ClienteEnDomicilio = sequelize.define('clienteEnDomicilio',{
     idCliente:{
         type:Sequelize.INTEGER,
-        primaryKey:true
+        primaryKey:true,
     },
     idDomicilio:{
         type:Sequelize.INTEGER,

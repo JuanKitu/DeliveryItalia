@@ -20,6 +20,7 @@ const potesRoutes = require('./routes/potes.js');
 const sucursalesRuotes = require('./routes/sucursales.js');
 const callesRoutes = require('./routes/calles.js');
 const apodosRoutes = require('./routes/apodos.js');
+const domiciliosRoutes = require('./routes/domicilios.js');
 /*--- middleware ---*/
 app.use(morgan('dev'));
 app.use(json());
@@ -31,6 +32,7 @@ app.use('/api/potes',potesRoutes);
 app.use('/api/sucursales',sucursalesRuotes);
 app.use('/api/calles',callesRoutes);
 app.use('/api/apodos',apodosRoutes);
+app.use('/api/domicilios',domiciliosRoutes);
 /*--- Starup ---*/
 app.listen(app.get('port'),()=>{
     console.log(`Server on port: ${app.get('port')}`.magenta);

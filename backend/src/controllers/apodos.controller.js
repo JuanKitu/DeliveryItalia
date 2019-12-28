@@ -23,7 +23,7 @@ controller.new = async (req, res) => {
             error: 'The server has been error'
         });
     }
-}
+};
 /*--- Query a apodo ---*/
 controller.getAll = async (req, res) => {
     try {
@@ -39,7 +39,7 @@ controller.getAll = async (req, res) => {
             error: 'The server has been error'
         });
     }
-}
+};
 /*--- Edit a apodo ---*/
 controller.change = async (req, res) => {
     const {idNombreCalle} = req.params;
@@ -72,7 +72,7 @@ controller.change = async (req, res) => {
             error: 'The server has been error'
         });
     }
-}
+};
 /*--- Delete a apodo ---*/
 controller.delete = async (req, res) => {
     try {
@@ -93,7 +93,7 @@ controller.delete = async (req, res) => {
             error: 'The server has been error'
         });
     }
-}
+};
 /*--- Find a apodo ---*/
 controller.getById = async (req, res) => {
     const { idNombreCalle } = req.params;
@@ -113,6 +113,6 @@ controller.getById = async (req, res) => {
             error: 'The server has been error'
         });
     }
-}
+};
 
 module.exports = controller;

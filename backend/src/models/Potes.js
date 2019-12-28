@@ -7,7 +7,8 @@ const ItemPedido = require('./ItemPedido');
 const Potes = sequelize.define('potes',{
     idPote:{
         type:Sequelize.INTEGER,
-        primaryKey:true
+        primaryKey:true,
+        autoIncrement: true
     },
     tamanio:{
         type:Sequelize.REAL,

@@ -8,7 +8,11 @@ const Pedidos = require('./Pedidos');
 const Domicilios = sequelize.define('domicilios',{
     idDomicilio:{
         type:Sequelize.INTEGER,
-        primaryKey:true
+        primaryKey:true,
+        autoIncrement: true
+    },
+    idCalle:{
+        type:Sequelize.INTEGER
     },
     numero:{
         type:Sequelize.INTEGER
@@ -16,10 +20,13 @@ const Domicilios = sequelize.define('domicilios',{
     piso:{
         type:Sequelize.STRING(50)
     },
+    nroDepto:{
+        type:Sequelize.STRING(10)
+    },
     referencias:{
         type:Sequelize.TEXT
     },
-    entrecalles:{
+    entreCalles:{
         type:Sequelize.TEXT
     }
 },{

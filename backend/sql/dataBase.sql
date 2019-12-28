@@ -38,11 +38,21 @@ CREATE TABLE sucursales(
     PRIMARY KEY("idSucursal")
 );
 
-CREATE TABLE personas(
-    dni INT NOT NULL,
-    nombre VARCHAR(50) NOT NULL,
-    apellido VARCHAR(50) NOT NULL,
-    PRIMARY KEY(dni)
+CREATE TABLE cuentas(
+    "idCuenta" INT NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    password VARCHAR NOT NULL,
+    PRIMARY KEY("idCuenta")
+);
+
+CREATE TABLE clientes(
+    "idCliente" serial NOT NULL,
+    dni INT,
+    nombre VARCHAR(50),
+    apellido VARCHAR(50),
+    "idCuenta" INT NOT NULL,
+    PRIMARY KEY("idCliente"),
+    FOREIGN KEY("idCuenta") REFERENCES cuenta
 );
 
 CREATE TABLE calles(
@@ -51,19 +61,12 @@ CREATE TABLE calles(
     PRIMARY KEY("idCalle"),
 );
 
-CREATE TABLE clientes(
-    "idCliente" serial NOT NULL,
-    dni INT,
-    PRIMARY KEY("idCliente"),
-    FOREIGN KEY(dni) REFERENCES personas
-);
-
 CREATE TABLE domicilios(
     "idDomicilio" SERIAL NOT NULL,
     "idCalle" INT NOT NULL,
     numero INT NOT NULL,
     piso VARCHAR(50),
-    "nroDept" VARCHAR(10),
+    "nroDepto" VARCHAR(10),
     referencias TEXT,
     "entreCalles" TEXT,
     PRIMARY KEY("idDomicilio")

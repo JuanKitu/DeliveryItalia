@@ -6,12 +6,16 @@ const Apodos = sequelize.define('apodos',{
         type: Sequelize.INTEGER,
         primaryKey:true,
     },
+    idCalle:{
+        type:Sequelize.INTEGER,
+        primaryKey:true
+    },
     nombreCalle:{
         type:Sequelize.STRING(100)
     }
 },{
     timestamps: false,
-    freezeTableName: true //this is so that sequelize does not pluralize the table
+    freezeTableName: true, //this is so that sequelize does not pluralize the table
 });
 
 module.exports = Apodos;

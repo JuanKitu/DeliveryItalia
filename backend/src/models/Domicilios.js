@@ -28,8 +28,6 @@ const Domicilios = sequelize.define('domicilios',{
 });
 
 Domicilios.associate = (models)=>{
-    /*--- cardinality with Calle ---*/
-    Domicilios.belongsToMany(models.Calles,{through: 'DomicilioPertCalle', foreignKey: 'idDomicilio', as: 'Calles'});
     /*--- cardinality with Clientes ---*/
     Domicilios.belongsToMany(models.Clientes,{through: 'ClienteEnDomicilios', foreignKey: 'idDomicilio', as: 'Clientes'});
 };
@@ -38,6 +36,6 @@ Domicilios.associate = (models)=>{
 
 
 /*--- cardinality with Clientes ---*/
-Domicilios.HasMany(Pedidos,{foreignKey:idDomicilio,sourceKey:idDomicilio});
-Pedidos.belongsTo(Domicilios,{foreignKey:idDomicilio,sourceKey:idDomicilio});
+Domicilios.hasMany(Pedidos,{foreignKey:'idDomicilio',sourceKey:'idDomicilio'});
+Pedidos.belongsTo(Domicilios,{foreignKey:'idDomicilio',sourceKey:'idDomicilio'});
 module.exports = Domicilios;

@@ -26,7 +26,7 @@ const Gustos = sequelize.define('gustos',{
 });
 /*--- cardinaly with Pote ---*/
 Gustos.associate = (models) =>{
-    Gustos.belongsToMany(models.Potes,{through:'GustosEnPotes',foreingKey:'idGusto', as:'Potes'});
+    Gustos.belongsToMany(models.Potes,{through:'GustosEnPotes',foreignKey:'idGusto', as:'Potes'});
 };
 
 

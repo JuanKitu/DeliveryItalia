@@ -29,7 +29,7 @@ Potes.associate = (models) => {
   };
 //Gustos.belongsToMany(Potes,{through:GustosEnPotes,foreingKey:'idGusto', as:'Potes'});
 /*--- cardinaly with ItemPedido ---*/
-Potes.hasMany(ItemPedido,{foreingKey:'idPote',sourceKey:'idPote'});
+Potes.hasMany(ItemPedido,{foreignKey:'idPote',sourceKey:'idPote'});
 
-ItemPedido.belongsTo(Potes,{foreingKey:'idPote',sourceKey:'idPote'});
+ItemPedido.belongsTo(Potes,{foreignKey:'idPote',sourceKey:'idPote'});
 module.exports = Potes;

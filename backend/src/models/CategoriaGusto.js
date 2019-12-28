@@ -16,8 +16,8 @@ const CategoriaGusto = sequelize.define('categoriaGusto',{
     freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- cardinaly with Gustos ---*/
-CategoriaGusto.hasMany(Gustos,{foreingKey:'idCategoria',sourceKey:'idCategoria'});
-Gustos.belongsTo(CategoriaGusto,{foreingKey:'idCategoria',sourceKey:'idCategoria'});
+CategoriaGusto.hasMany(Gustos,{foreignKey:'idCategoria',sourceKey:'idCategoria'});
+Gustos.belongsTo(CategoriaGusto,{foreignKey:'idCategoria',sourceKey:'idCategoria'});
 
 
 

@@ -184,7 +184,7 @@ controller.addGusto = async (req, res) => {
                 },
                 attributes: ['idGusto', 'idPote', 'vecesUsado']
             })
-            if (gustoEnPote !== null) {
+            if (gustoEnPote) {
                 const addVecesUsado = gustoEnPote.vecesUsado + 1;
                 await GustosEnPotes.update({
                     vecesUsado: addVecesUsado,
@@ -265,7 +265,7 @@ controller.deleteGusto = async (req, res) => {
                 },
                 attributes: ['idGusto', 'idPote', 'vecesUsado']
             })
-            if (gustoEnPote !== null && gustoEnPote.vecesUsado > 1) {
+            if (gustoEnPote && gustoEnPote.vecesUsado > 1) {
                 const dissVecesUsado = gustoEnPote.vecesUsado - 1;
                 await GustosEnPotes.update({
                     vecesUsado: dissVecesUsado,
@@ -286,7 +286,7 @@ controller.deleteGusto = async (req, res) => {
                             idPote
                         }
                     })
-            } else if (gustoEnPote !== null) {
+            } else if (gustoEnPote) {
                 GustosEnPotes.destroy({
                     where: {
                         idGusto,

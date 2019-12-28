@@ -38,9 +38,9 @@ const Pedidos = sequelize.define('pedidos',{
     freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- Composition with ItemPedido ---*/
-Pedidos.hasMany(ItemPedido,{foreingKey:'idPedido',sourceKey:'idPedido'});
-ItemPedido.belongsTo(Pedidos,{foreingKey:'idPedido',sourceKey:'idPedido'});
+Pedidos.hasMany(ItemPedido,{foreignKey:'idPedido',sourceKey:'idPedido'});
+ItemPedido.belongsTo(Pedidos,{foreignKey:'idPedido',sourceKey:'idPedido'});
 /*--- Composition with EstadoPedido ---*/
-Pedidos.hasMany(EstadoPedido,{foreingKey:'idPedido',sourceKey:'idPedido'});
-EstadoPedido.belongsTo(Pedidos,{foreingKey:'idPedido',sourceKey:'idPedido'});
+Pedidos.hasMany(EstadoPedido,{foreignKey:'idPedido',sourceKey:'idPedido'});
+EstadoPedido.belongsTo(Pedidos,{foreignKey:'idPedido',sourceKey:'idPedido'});
 module.exports = Pedidos;

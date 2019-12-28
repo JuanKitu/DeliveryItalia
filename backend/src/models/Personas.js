@@ -18,6 +18,6 @@ const Personas = sequelize.define('personas',{
     freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- cardinality with Clientes ---*/
-Personas.hasMany(Clientes,{foreingKey:dni, sourceKey:dni});
-Clientes.belongsTo(Personas,{foreingKey:dni, sourceKey:dni});
+Personas.hasMany(Clientes,{foreignKey:dni, sourceKey:dni});
+Clientes.belongsTo(Personas,{foreignKey:dni, sourceKey:dni});
 module.exports = Personas;

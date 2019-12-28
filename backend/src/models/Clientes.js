@@ -23,7 +23,7 @@ Clientes.associate = (models)=>{
 }
 
 /*--- cardinality with Domicilios ---*/
-Clientes.hasMany(Pedidos,{foreingKey:idCliente,sourceKey:idCliente});
-Pedidos.belongsTo(Clientes,{foreingKey:idCliente,sourceKey:idCliente});
+Clientes.hasMany(Pedidos,{foreignKey:'idCliente',sourceKey:'idCliente'});
+Pedidos.belongsTo(Clientes,{foreignKey:'idCliente',sourceKey:'idCliente'});
 
 module.exports = Clientes;

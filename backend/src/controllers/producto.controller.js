@@ -17,7 +17,6 @@ let upload = multer({ storage: storage }).single('image');
 
 /*--- Create a product ---*/
 controller.new = async (req, res) => {
-    console.log(req.params);
     const { nombre, descripcion, precio } = req.body;
     try {
         const newProducto = await Producto.create({

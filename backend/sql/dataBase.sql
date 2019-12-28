@@ -1,7 +1,9 @@
 CREATE TABLE apodos (
     "idNombreCalle" serial NOT NULL,
     "nombreCalle" VARCHAR(100) NOT NULL,
-    PRIMARY KEY("idNombreCalle")
+    "idCalle" INT NOT NULL,
+    PRIMARY KEY("idNombreCalle","idCalle"),
+    FOREIGN key("idCalle") REFERENCES calles
 );
 -- si no se pone las "" pgadmin toma automaticamente la cadena de texto totalmente en minusculas
 CREATE TABLE producto(
@@ -46,9 +48,7 @@ CREATE TABLE personas(
 CREATE TABLE calles(
     "idCalle" serial NOT NULL,
     "nombreFormal" VARCHAR(100) NOT NULL,
-    "idNombreCalle" iNT NOT NULL,
     PRIMARY KEY("idCalle"),
-    FOREIGN KEY ("idNombreCalle") REFERENCES apodos
 );
 
 CREATE TABLE clientes(
@@ -60,21 +60,14 @@ CREATE TABLE clientes(
 
 CREATE TABLE domicilios(
     "idDomicilio" SERIAL NOT NULL,
+    "idCalle" INT NOT NULL,
     numero INT NOT NULL,
     piso VARCHAR(50),
     "nroDept" VARCHAR(10),
     referencias TEXT,
     "entreCalles" TEXT,
     PRIMARY KEY("idDomicilio")
-);
-
-CREATE TABLE "domicilioPertCalle"(
-    --que domicilio pertenece a que calle
-    "idCalle" INT NOT NULL,
-    "idDomicilio" INT,
-    PRIMARY KEY("idCalle", "idDomicilio"),
-    FOREIGN KEY("idCalle") REFERENCES calles,
-    FOREIGN kEY("idDomicilio") REFERENCES domicilios
+    FOREIGN KEY("idCalle") REFERENCES calles
 );
 
 CREATE TABLE "clienteEnDomicilios"(

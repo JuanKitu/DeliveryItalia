@@ -24,6 +24,6 @@ const Producto = sequelize.define('producto',{
 });
 
 /*--- cardinaly ItemPedido ---*/
-Producto.hasMany(ItemPedido,{foreingKey:'idProducto',sourceKey:'idProducto'});
-ItemPedido.belongsTo(Producto,{foreingKey:'idProducto',sourceKey:'idProducto'});
+Producto.hasMany(ItemPedido,{foreignKey:'idProducto',sourceKey:'idProducto'});
+ItemPedido.belongsTo(Producto,{foreignKey:'idProducto',sourceKey:'idProducto'});
 module.exports = Producto;

@@ -139,9 +139,10 @@ controller.getGustos = async (req, res) => {
         });
         const gusto = [];
         for (let inc = 0; inc < gustosEnPote.length; inc++) {
+            const idGusto = gustosEnPote[inc].idGusto;
             const gustoAux = await Gustos.findOne({
                 where: {
-                    idGusto: gustosEnPote[inc].idGusto
+                    idGusto
                 },
                 attributes: ['idGusto', 'nombre', 'descripcion', 'disponible', 'idCategoria']
             });
@@ -170,13 +171,7 @@ controller.addGusto = async (req, res) => {
             attributes: ['idPote', 'cantidad', 'cantidadMaxima']
         });
 
-        if (pote.cantidad <= pote.cantidadMaxima) {
-            const gustoSeleccionado = await Gustos.findOne({
-                where: {
-                    idGusto
-                },
-                attributes: ['idGusto']
-            });
+        if (pote.cantidad < pote.cantidadMaxima) {
             const gustoEnPote = await GustosEnPotes.findOne({
                 where: {
                     idGusto,
@@ -242,15 +237,16 @@ controller.addGusto = async (req, res) => {
 /*--- delete gusto pote ---*/
 controller.deleteGusto = async (req, res) => {
     try {
-        const { idPote } = req.params;
-        const { idGusto } = req.body;
+        const { idPote, idGusto } = req.params;
         const pote = await Potes.findOne({
             where: {
                 idPote
             },
             attributes: ['idPote', 'cantidad', 'cantidadMaxima']
         });
-
+        console.log(pote.cantidad);
+        console.log("<=");
+        console.log(pote.cantidadMaxima);
         if (pote.cantidad <= pote.cantidadMaxima) {
             const gustoSeleccionado = await Gustos.findOne({
                 where: {
@@ -325,7 +321,7 @@ controller.deleteGusto = async (req, res) => {
         return res.json({
             error: 'The server has been error',
             data: {}
-        })
+        });
     }
 
 

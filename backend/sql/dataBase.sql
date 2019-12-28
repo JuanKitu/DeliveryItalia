@@ -77,6 +77,8 @@ CREATE TABLE "clienteEnDomicilios"(
     --que cliente se encuentra en que domicilio
     "idCliente" int NOT NULL,
     "idDomicilio" INT,
+    "nombrePilaDestinatario" VARCHAR(150),
+    "dniDestinatario" INT,
     PRIMARY KEY("idCliente", "idDomicilio"),
     FOREIGN KEY("idCliente") REFERENCES clientes,
     FOREIGN KEY("idDomicilio") REFERENCES domicilios

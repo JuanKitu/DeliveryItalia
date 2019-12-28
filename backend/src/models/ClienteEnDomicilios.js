@@ -9,6 +9,12 @@ const ClienteEnDomicilio = sequelize.define('clienteEnDomicilio',{
     idDomicilio:{
         type:Sequelize.INTEGER,
         primaryKey:true
+    },
+    nombrePilaDestinatario:{
+        type:Sequelize.STRING(150)
+    },
+    dniDestinatario:{
+        type:Sequelize.INTEGER
     }
 },{
     timestamps: false,

@@ -134,10 +134,7 @@ controller.getCalle = async (req, res) => {
             return res.json({
                 data:calle
             })
-        }
-        return res.json({
-            data:domicilio
-        })
+        };
     } catch (error) {
         console.log(error);
         return res.json({

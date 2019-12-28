@@ -11,6 +11,6 @@ router.put('/:idPote',controller.change);;
 /*--- about a specific pot taste ---*/
 router.get('/:idPote/gustos',controller.getGustos);
 router.post('/:idPote/gustos',controller.addGusto);
-router.delete('/:idPote/gustos',controller.deleteGusto);
+router.delete('/:idPote/gustos/:idGusto',controller.deleteGusto);
 
 module.exports = router;

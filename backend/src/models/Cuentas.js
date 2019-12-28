@@ -19,6 +19,6 @@ const Cuentas = sequelize.define('cuentas',{
     freezeTableName: true //this is so that sequelize does not pluralize the table
 });
 /*--- cardinality with Clientes ---*/
-Cuentas.hasMany(Clientes,{foreignKey:idCuenta, sourceKey:idCuenta});
-Clientes.belongsTo(Cuentas,{foreignKey:idCuenta, sourceKey:idCuenta});
+Cuentas.hasMany(Clientes,{foreignKey:'idCuenta', sourceKey:'idCuenta'});
+Clientes.belongsTo(Cuentas,{foreignKey:'idCuenta', sourceKey:'idCuenta'});
 module.exports = Cuentas;

@@ -3,7 +3,8 @@ const ItemPedido = require('../models/ItemPedido.js');
 const EstadoPedidos = require('../models/EstadoPedidos.js');
 const Sucursales = require('../models/Sucursales.js');
 const Clientes = require('../models/Clientes.js');
-const Potes = require ('../models/Potes.js');
+const Potes = require('../models/Potes.js');
+const Producto = require('../models/Producto.js');
 const controller = {};
 
 /*--- Create of pedido ---*/
@@ -275,7 +276,7 @@ controller.changeEstadoPedidos = async (req, res) => {
 /*--- Delete of EstadoPedido ---*/
 controller.deleteEstadoPedidos = async (req, res) => {
     try {
-        const { idEstado,idPedido } = req.params;
+        const { idEstado, idPedido } = req.params;
         const deleteRowCount = await EstadoPedidos.destroy({
             where: {
                 idEstado,
@@ -314,7 +315,7 @@ controller.getEstadoById = async (req, res) => {
     }
 };
 /*--- Finsh/notFiinish EstadoPedido ---*/
-controller.getFinish = async (req, res) => {
+controller.getFinishEstado = async (req, res) => {
     const { idPedido, idEstado } = req.params;
     try {
         const oldEstadoPedido = await EstadoPedidos.findOne({
@@ -376,31 +377,31 @@ controller.getFinish = async (req, res) => {
 };
 /*######################################### ItemPedido API REST #########################################*/
 /*--- Create of ItemPedido by Pedido ---*/
-controller.newItemPedidos = async (req,res)=>{
-    const {idPedido}= req.params;
-    try{
+controller.newItemPedidos = async (req, res) => {
+    const { idPedido } = req.params;
+    try {
         const newItemPedido = ItemPedido.create({
             idPedido
         });
-        if(newItemPedido){
+        if (newItemPedido) {
             return res.json({
-                message:'The ItemPedido has been created',
-                data:newItemPedido
+                message: 'The ItemPedido has been created',
+                data: newItemPedido
             });
         };
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return res.json({
             error: 'The server has been error'
-        });    
+        });
     }
 };
 /*--- Delete of ItemPedido by Pedido ---*/
 controller.deleteItemPedidos = async (req, res) => {
     try {
-        const { idItemPedido,idPedido } = req.params;
+        const { idItemPedido, idPedido } = req.params;
         const itemPedido = await ItemPedido.findOne({
-            where:{
+            where: {
                 idItemPedido,
                 idPedido
             }
@@ -412,7 +413,7 @@ controller.deleteItemPedidos = async (req, res) => {
                 idPedido
             }
         });
-        if(idPote){
+        if (idPote) {
             const deleteRowCountPotes = await Potes.destroy({
                 where: {
                     idPote
@@ -422,12 +423,12 @@ controller.deleteItemPedidos = async (req, res) => {
                 message: 'The ItemPedido has been deleted',
                 countItemPedido: deleteRowCountItemPedido,
                 countPotes: deleteRowCountPotes,
-            }); 
+            });
         }
         return res.json({
             message: 'The ItemPedido has been deleted',
             countItemPedido: deleteRowCountItemPedido,
-            countPotes:null
+            countPotes: null
         });
     } catch (error) {
         console.log(error);
@@ -454,7 +455,160 @@ controller.getAllItemPedidos = async (req, res) => {
             error: 'The server has been error'
         });
     }
-}
+};
+/*--- Find One ItemPedido ---*/
+controller.getItemById = async (req, res) => {
+    const { idPedido, idItemPedido } = req.params;
+    try {
+        const itemPedido = await ItemPedido.findOne({
+            where: {
+                idPedido,
+                idItemPedido
+            }
+        });
+        return res.json({
+            data: itemPedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Add pote by ItemPedido  ---*/
+controller.addPote = async (req, res) => {
+    const {idPedido, idItemPedido}=req.params;
+    const { idPote, cantidad } = req.params;
+    try {
+        const pote = await Potes.findOne({
+            where:{
+                idPote
+            }
+        });
+        if(pote){
+            await ItemPedido.update({
+                idPote,
+                cantidad
+            },
+            {
+                where:{
+                    idPedido,
+                    idItemPedido
+                }
+            });
+            const itemPedido = await ItemPedido.findOne({
+                where:{
+                    idPedido,
+                    idItemPedido
+                }
+            });
+            res.json({
+                message:'The Pote has been added to ItemPedido',
+                data:itemPedido
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Add producto by ItemPedido  ---*/
+controller.addProducto = async (req, res) => {
+    const {idPedido, idItemPedido}=req.params;
+    const { idProducto, cantidad } = req.params;
+    try {
+        const producto = await Producto.findOne({
+            where:{
+                idProducto
+            }
+        });
+        if(producto){
+            await ItemPedido.update({
+                idProducto,
+                cantidad
+            },
+            {
+                where:{
+                    idPedido,
+                    idItemPedido
+                }
+            });
+            const itemPedido = await ItemPedido.findOne({
+                where:{
+                    idPedido,
+                    idItemPedido
+                }
+            });
+            res.json({
+                message:'The Producto has been added to ItemPedido',
+                data:itemPedido
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+controller.calculatepriceItem = async (req,res)=>{
+    const {idPedido, idItemPedido} = req.params;
+    try{
+        const itemPedido = await ItemPedido.findOne({
+            where:{
+                idPedido,
+                idItemPedido
+            }
+        });
+        const cantidad = itemPedido.cantidad;
+        //si el item es sobre un producto
+        if(itemPedido.idProducto){
+            const idProducto = itemPedido.idProducto;
+            const producto = Producto.findOne({
+                where:{
+                    idProducto
+                }
+            });
+            const precio = producto.precio;
+            const precioTotal = precio*cantidad;
+            await ItemPedido.update({
+                precioTotal
+            },
+            {
+                where:{
+                    idPedido,
+                    idItemPedido
+                }
+            });
+            const updateItemPedido = await ItemPedido.findOne({
+                where:{
+                    idPedido,
+                    idItemPedido
+                }
+            });
+            res.json({
+                message:'The ItemPedido has been updateed',
+                data:updateItemPedido
+            });
+        };
+        //Si el item es sobre un pote de helado
+        if(itemPedido.idPote){
+
+        };
+        return res.json({
+            error:'The itemPedido has not been linked producto or pote'
+        });
+    }catch(error){
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+
 /*#######################################################################################################*/
 
 

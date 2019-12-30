@@ -166,7 +166,8 @@ controller.getAllPedido = async (req,res)=>{
             error: 'The server has been error'
         }); 
     }
-}
+};
+/*##################################### ClienteEnDomicilios API REST ####################################*/
 /*--- Find domicilios by cliente ---*/
 controller.getDomicilios = async (req, res) => {
     const { idCliente } = req.params;
@@ -337,4 +338,5 @@ controller.deleteDomicilio = async (req, res) => {
         });
     }
 };
+/*#######################################################################################################*/
 module.exports = controller;

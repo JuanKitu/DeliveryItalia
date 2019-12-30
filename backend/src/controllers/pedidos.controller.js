@@ -1,0 +1,461 @@
+const Pedidos = require('../models/Pedidos.js');
+const ItemPedido = require('../models/ItemPedido.js');
+const EstadoPedidos = require('../models/EstadoPedidos.js');
+const Sucursales = require('../models/Sucursales.js');
+const Clientes = require('../models/Clientes.js');
+const Potes = require ('../models/Potes.js');
+const controller = {};
+
+/*--- Create of pedido ---*/
+controller.new = async (req, res) => {
+    const { fechaPedido, cuit, idDomicilio, idCliente, idSucursal, idMedioPago, descripcion } = req.body;
+    try {
+        const [day, month, year] = fechaPedido.split("-");//I destruct the string to accommodate the format of the date at ease :)
+        const newFechaPedido = new Date(year, month - 1, day);//No se porque pero siempre te hace un mes adelantado
+        const newPedido = await Pedidos.create({
+            fechaPedido: newFechaPedido,
+            cuit,
+            idDomicilio,
+            idCliente,
+            idSucursal,
+            idMedioPago,
+            descripcion
+        });
+        if (newPedido) {
+            return res.json({
+                message: 'The Pedido has been created',
+                data: newPedido
+            });
+        };
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Query of pedido ---*/
+controller.getAll = async (req, res) => {
+    try {
+        const pedidos = await Pedidos.findAll();
+        return res.json({
+            data: pedidos
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Edit of pedido ---*/
+controller.change = async (req, res) => {
+    const { idPedido } = req.params;
+    const { fechaPedido, montoTotal, cuit, idDomicilio, idCliente, idSucursal, idMedioPago, descripcion } = req.body;
+    const [day, month, year] = fechaPedido.split("-");//I destruct the string to accommodate the format of the date at ease :)
+    console.log(year);
+    const newFechaPedido = new Date(year, month - 1, day, 0, 0, 0);
+    console.log(newFechaPedido);
+    try {
+        await Pedidos.update({
+            fechaPedido: newFechaPedido,
+            montoTotal,
+            cuit,
+            idDomicilio,
+            idCliente,
+            idSucursal,
+            idMedioPago,
+            descripcion
+        },
+            {
+                where: {
+                    idPedido
+                }
+            });
+        const pedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        return res.json({
+            message: 'The pedido has been changed',
+            data: pedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Delete of pedido ---*/
+controller.delete = async (req, res) => {
+    try {
+        const { idPedido } = req.params;
+
+        const deleteRowCountPedido = await Pedidos.destroy({
+            where: {
+                idPedido
+            }
+        });
+        const deleteRowCountEstadoPedido = await EstadoPedido.destroy({
+            where: {
+                idPedido
+            }
+        });
+        const deleteRowCountItemPedido = await ItemPedido.destroy({
+            where: {
+                idPedido
+            }
+        });
+        return res.json({
+            message: 'The Pedido has been deleted',
+            countPedido: deleteRowCountPedido,
+            countEstadoPedido: deleteRowCountEstadoPedido,
+            countItemPedido: deleteRowCountItemPedido
+
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Find of pedido ---*/
+controller.getById = async (req, res) => {
+    const { idPedido } = req.params
+    try {
+        const pedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        return res.json({
+            data: pedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Find Sucursal by pedido ---*/
+controller.getSucursal = async (req, res) => {
+    const { idPedido } = req.params;
+    try {
+        const pedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        const idSucursal = pedido.idSucursal;
+        console.log(pedido);
+        const sucursal = await Sucursales.findOne({
+            where: {
+                idSucursal
+            }
+        });
+        res.json({
+            data: sucursal
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Find Cliente by pedido ---*/
+controller.getCliente = async (req, res) => {
+    const { idPedido } = req.params;
+    try {
+        const pedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        const idCliente = pedido.idCliente;
+        const cliente = await Clientes.findOne({
+            where: {
+                idCliente
+            }
+        });
+        res.json({
+            data: cliente
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+
+/*######################################## EstadoPèdido API REST ########################################*/
+/*--- Create of EstadoPedido ---*/
+controller.newEstadoPedido = async (req, res) => {
+    const { idPedido } = req.params;
+    const { nombre, descripcion } = req.body;
+    try {
+        const fechaIncioEstado = Date.now();
+        const newEstadoPedido = await EstadoPedidos.create({
+            idPedido,
+            nombre,
+            fechaIncioEstado,
+            descripcion
+        });
+        if (newEstadoPedido) {
+            return res.json({
+                message: 'The estado has been created',
+                data: newEstadoPedido
+            });
+        };
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Find All EstadoPedidos ---*/
+controller.getAllEstadosPedidos = async (req, res) => {
+    const { idPedido } = req.params;
+    try {
+        const estadoPedidos = await EstadoPedidos.findAll({
+            where: {
+                idPedido
+            }
+        });
+        return res.json({
+            data: estadoPedidos
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Edit of EstadoPedido ---*/
+controller.changeEstadoPedidos = async (req, res) => {
+    const { idPedido, idEstado } = req.params;
+    const { nombre, descripcion } = req.body;
+    try {
+        const fechaIncioEstado = Date.now();
+        await EstadoPedidos.update({
+            nombre,
+            fechaIncioEstado,
+            descripcion
+        },
+            {
+                where: {
+                    idEstado,
+                    idPedido
+                }
+            });
+        const estadoPedido = await EstadoPedidos.findOne({
+            where: {
+                idEstado,
+                idPedido
+            }
+        });
+        return res.json({
+            message: 'The EstadoPedido has been changed',
+            data: estadoPedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Delete of EstadoPedido ---*/
+controller.deleteEstadoPedidos = async (req, res) => {
+    try {
+        const { idEstado,idPedido } = req.params;
+        const deleteRowCount = await EstadoPedidos.destroy({
+            where: {
+                idEstado,
+                idPedido
+            }
+        });
+        return res.json({
+            message: 'The EstadoPedido has been deleted',
+            count: deleteRowCount,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Find One EstadoPedido ---*/
+controller.getEstadoById = async (req, res) => {
+    const { idPedido, idEstado } = req.params;
+    try {
+        const estadoPedido = await EstadoPedidos.findOne({
+            where: {
+                idPedido,
+                idEstado
+            }
+        });
+        return res.json({
+            data: estadoPedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Finsh/notFiinish EstadoPedido ---*/
+controller.getFinish = async (req, res) => {
+    const { idPedido, idEstado } = req.params;
+    try {
+        const oldEstadoPedido = await EstadoPedidos.findOne({
+            where: {
+                idPedido,
+                idEstado
+            }
+        });
+        if (oldEstadoPedido.fechaFinEstado) {
+            const fechaFinEstado = Date.now();
+            await EstadoPedidos.update({
+                fechaFinEstado
+            },
+                {
+                    where: {
+                        idPedido,
+                        idEstado
+                    }
+                });
+            const estadoPedido = await EstadoPedidos.findOne({
+                where: {
+                    idPedido,
+                    idEstado
+                }
+            });
+            return res.json({
+                message: 'The estado has been finished',
+                data: estadoPedido
+            });
+        };
+        //The estado already finished
+        const fechaFinEstado = null;
+        await EstadoPedidos.update({
+            fechaFinEstado
+        },
+            {
+                where: {
+                    idEstado,
+                    idPedido
+                }
+            });
+        //change value fechafinestado to null
+        const estadoPedido = await EstadoPedidos.findOne({
+            where: {
+                idPedido,
+                idEstado
+            }
+        });
+        return res.json({
+            message: 'The estado has not been finished',
+            data: estadoPedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*######################################### ItemPedido API REST #########################################*/
+/*--- Create of ItemPedido by Pedido ---*/
+controller.newItemPedidos = async (req,res)=>{
+    const {idPedido}= req.params;
+    try{
+        const newItemPedido = ItemPedido.create({
+            idPedido
+        });
+        if(newItemPedido){
+            return res.json({
+                message:'The ItemPedido has been created',
+                data:newItemPedido
+            });
+        };
+    }catch(error){
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });    
+    }
+};
+/*--- Delete of ItemPedido by Pedido ---*/
+controller.deleteItemPedidos = async (req, res) => {
+    try {
+        const { idItemPedido,idPedido } = req.params;
+        const itemPedido = await ItemPedido.findOne({
+            where:{
+                idItemPedido,
+                idPedido
+            }
+        });
+        const idPote = itemPedido.idPote;
+        const deleteRowCountItemPedido = await ItemPedido.destroy({
+            where: {
+                idItemPedido,
+                idPedido
+            }
+        });
+        if(idPote){
+            const deleteRowCountPotes = await Potes.destroy({
+                where: {
+                    idPote
+                }
+            });
+            return res.json({
+                message: 'The ItemPedido has been deleted',
+                countItemPedido: deleteRowCountItemPedido,
+                countPotes: deleteRowCountPotes,
+            }); 
+        }
+        return res.json({
+            message: 'The ItemPedido has been deleted',
+            countItemPedido: deleteRowCountItemPedido,
+            countPotes:null
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Find All ItemPedidos ---*/
+controller.getAllItemPedidos = async (req, res) => {
+    const { idPedido } = req.params;
+    try {
+        const itemPedido = await ItemPedido.findAll({
+            where: {
+                idPedido
+            }
+        });
+        res.json({
+            data: itemPedido
+        })
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+}
+/*#######################################################################################################*/
+
+
+module.exports = controller;

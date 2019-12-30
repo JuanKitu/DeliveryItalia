@@ -103,28 +103,30 @@ CREATE TABLE "gustosEnPotes"(
 );
 
 CREATE TABLE pedidos (
-    "idPedido" serial not null,
+    "idPedido" SERIAL not null,
     "fechaPedido" TIMESTAMP WITH TIME ZONE not null,
-    "montoTotal" real not null,
-    "montoPagaCliente" real not null,
-    cuit int,
+    "montoTotal" REAL,
+    "montoPagaCliente" REAL not null,
+    cuit BIGINT,
     "idDomicilio" INT,
     "idCliente" INT,
     "idSucursal" INT,
+    "idMedioPago" INT,
     descripcion TEXT,
     FOREIGN KEY("idCliente") REFERENCES clientes,
     FOREIGN KEY("idDomicilio") REFERENCES domicilios,
     FOREIGN KEY("idSucursal") REFERENCES sucursales,
+    FOREIGN KEY("idMedioPago") REFERENCES "medioPago"
     PRIMARY KEY("idPedido")
 );
 
 CREATE TABLE "itemPedido"(
     "idItemPedido" serial NOT NULL,
     "idPedido" int NOT NULL,
-    "precioTotal" real NOT NULL,
-    cantidad int NOT NULL,
-    "idPote" int NOT NULL,
-    "idProducto" int NOT NULL,
+    "precioTotal" REAL,
+    cantidad INT,
+    "idPote" INT,
+    "idProducto" INT,
     descripcion TEXT,
     PRIMARY KEY("idItemPedido", "idPedido"),
     FOREIGN KEY("idPote") REFERENCES potes,
@@ -141,4 +143,10 @@ CREATE TABLE "estadoPedido"(
     "idPedido" int NOT NULL,
     PRIMARY KEY("idEstado", "idPedido"),
     FOREIGN KEY("idPedido") REFERENCES pedidos
+);
+
+CREATE TABLE "medioPago"(
+    "idMedioPago" SERIAL NOT NULL,
+    descripcion TEXT,
+    PRIMARY KEY ("idMedioPago")
 );

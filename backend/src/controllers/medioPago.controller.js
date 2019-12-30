@@ -1,20 +1,16 @@
-const Apodos = require('../models/Apodos.js');
+const MedioPago = require('../models/MedioPago.js');
 const controller = {};
 /*--- Create a apodo ---*/
 controller.new = async (req, res) => {
-    const { nombreCalle, idCalle } = req.body;
+    const { descripcion } = req.body;
     try {
-        const newApodo = await Apodos.create({
-            nombreCalle,
-            idCalle
-        },
-        {
-            fields: ['nombreCalle','idCalle']
+        const newMedioPago = await MedioPago.create({
+            descripcion
         });
-        if(newApodo){
+        if(newMedioPago){
             return res.json({
-                message:'The Apodo has been created',
-                data:newApodo
+                message:'The Medio de Pago has been created',
+                data:newMedioPago
             });
         } ;
     } catch (error) {
@@ -27,11 +23,9 @@ controller.new = async (req, res) => {
 /*--- Query a apodo ---*/
 controller.getAll = async (req, res) => {
     try {
-        apodos = await Apodos.findAll({
-            attributes: ['idNombreCalle','nombreCalle','idCalle']
-        });
+        medioPago = await MedioPago.findAll();
         return res.json({
-            data:apodos
+            data:medioPago
         });
     } catch (error) {
         console.log(error);
@@ -42,29 +36,25 @@ controller.getAll = async (req, res) => {
 };
 /*--- Edit a apodo ---*/
 controller.change = async (req, res) => {
-    const {idNombreCalle} = req.params;
-    const { nombreCalle, idCalle } = req.body;
+    const {idMedioPago} = req.params;
+    const { descripcion} = req.body;
     try {
-        await Apodos.update({
-            nombreCalle,
-            idCalle
+        await MedioPago.update({
+            descripcion
         },
         {
             where:{
-                idNombreCalle
+                idMedioPago
             },
-        },
-        {
-            fields: ['idNombreCalle','nombreCalle','idCalle']
         });
-        const apodo = await Apodos.findOne({
+        const medioPago = await MedioPago.findOne({
             where:{
-                idNombreCalle
+                idMedioPago
             }
         });
         return res.json({
-            message: 'The apodo has been changed',
-            data:apodo
+            message: 'The Medio de Pago has been changed',
+            data:medioPago
         });
     } catch (error) {
         console.log(error);
@@ -76,14 +66,14 @@ controller.change = async (req, res) => {
 /*--- Delete a apodo ---*/
 controller.delete = async (req, res) => {
     try {
-        const { idNombreCalle } = req.params;
-        const deleteRowCount = await Apodos.destroy({
+        const { idMedioPago } = req.params;
+        const deleteRowCount = await MedioPago.destroy({
             where: {
-                idNombreCalle
+                idMedioPago
             }
         });
         return res.json({
-            message: 'The apodo has been deleted',
+            message: 'The Medio de Pago has been deleted',
             count: deleteRowCount
         });
 
@@ -96,15 +86,15 @@ controller.delete = async (req, res) => {
 };
 /*--- Find a apodo ---*/
 controller.getById = async (req, res) => {
-    const { idNombreCalle } = req.params;
+    const { idMedioPago } = req.params;
     try {
-        apodo = await Apodos.findOne({
+        medioPago = await MedioPago.findOne({
             where:{
-                idNombreCalle
+                idMedioPago
             }
         });
         return res.json({
-            data:apodo
+            data:medioPago
         });
     } catch (error) {
         console.log(error);

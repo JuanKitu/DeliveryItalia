@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const {sequelize} = require('../database/database.js');
 
-const EstadoPedido = sequelize.define('estadoPedido',{
+const EstadoPedidos = sequelize.define('estadoPedido',{
     idEstado:{
         type:Sequelize.INTEGER,
         primaryKey:true,
@@ -27,4 +27,4 @@ const EstadoPedido = sequelize.define('estadoPedido',{
     timestamps: false,
     freezeTableName: true //this is so that sequelize does not pluralize the table
 });
-module.exports = EstadoPedido;
+module.exports = EstadoPedidos;

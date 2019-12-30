@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const {sequelize} = require('../database/database.js');
 const ItemPedido = require('./ItemPedido');
-const EstadoPedido = require('./EstadoPedido');
+const EstadoPedidos = require('./EstadoPedidos');
 
 const Pedidos = sequelize.define('pedidos',{
     idPedido:{
@@ -19,7 +19,7 @@ const Pedidos = sequelize.define('pedidos',{
         type:Sequelize.REAL
     },
     cuit:{
-        type:Sequelize.INTEGER
+        type:Sequelize.BIGINT
     },
     idDomicilio:{
         type:Sequelize.INTEGER
@@ -28,6 +28,9 @@ const Pedidos = sequelize.define('pedidos',{
         type:Sequelize.INTEGER
     },
     idSucursal:{
+        type:Sequelize.INTEGER
+    },
+    idMedioPago:{
         type:Sequelize.INTEGER
     },
     descripcion:{
@@ -42,6 +45,6 @@ const Pedidos = sequelize.define('pedidos',{
 Pedidos.hasMany(ItemPedido,{foreignKey:'idPedido',sourceKey:'idPedido'});
 ItemPedido.belongsTo(Pedidos,{foreignKey:'idPedido',sourceKey:'idPedido'});
 /*--- Composition with EstadoPedido ---*/
-Pedidos.hasMany(EstadoPedido,{foreignKey:'idPedido',sourceKey:'idPedido'});
-EstadoPedido.belongsTo(Pedidos,{foreignKey:'idPedido',sourceKey:'idPedido'});
+Pedidos.hasMany(EstadoPedidos,{foreignKey:'idPedido',sourceKey:'idPedido'});
+EstadoPedidos.belongsTo(Pedidos,{foreignKey:'idPedido',sourceKey:'idPedido'});
 module.exports = Pedidos;

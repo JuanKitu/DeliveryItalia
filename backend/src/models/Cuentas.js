@@ -13,6 +13,12 @@ const Cuentas = sequelize.define('cuentas',{
     },
     password:{
         type:Sequelize.STRING
+    },
+    salt: {
+        type:Sequelize.STRING
+    },
+    userType: {
+        type:Sequelize.INTEGER
     }
 },{
     timestamps: false,

@@ -5,8 +5,10 @@ const Sucursales = require('../models/Sucursales.js');
 const Clientes = require('../models/Clientes.js');
 const Potes = require('../models/Potes.js');
 const Producto = require('../models/Producto.js');
+const Constante_pote = require('../models/Constante_pote.js');
 const controller = {};
-
+const process = require('process');
+process.env.TZ = 'UTC-3';
 /*--- Create of pedido ---*/
 controller.new = async (req, res) => {
     const { fechaPedido, cuit, idDomicilio, idCliente, idSucursal, idMedioPago, descripcion } = req.body;
@@ -193,18 +195,69 @@ controller.getCliente = async (req, res) => {
         });
     }
 };
-
+/*--- Calculate Total Amuont of pedido  ---*/
+controller.calculateTotalAmount = async (req,res)=>{
+    const {idPedido} = req.params;
+    try{
+        itemsPedidos = await ItemPedido.findAll({
+            where:{
+                idPedido
+            }
+        });
+        for(let inc = 0;inc<itemsPedidos.length;inc++){
+            const auxPrecioTotal = itemsPedidos[inc].precioTotal;
+            //verificamos que el precio total tenga un valor valido
+            if(!auxPrecioTotal){
+                if(auxPrecioTotal <= 0){
+                    res.json({
+                        error:'missing items of the car',
+                        data:[]
+                    });
+                };
+            };
+        };
+        let montoTotal = 0;
+        for(let inc = 0;inc<itemsPedidos.length;inc++){
+            const auxPrecioTotal = itemsPedidos[inc].precioTotal;
+            montoTotal = montoTotal + auxPrecioTotal;
+        };
+        
+        await Pedidos.update({
+            montoTotal
+        },
+        {
+            where:{
+                idPedido
+            }
+        });
+        const pedido = await Pedidos.findOne({
+            where:{
+                idPedido
+            }
+        });
+        res.json({
+            message:'The monto total has been updated',
+            data:pedido
+        });
+    }catch(error){
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
 /*######################################## EstadoPèdido API REST ########################################*/
 /*--- Create of EstadoPedido ---*/
 controller.newEstadoPedido = async (req, res) => {
     const { idPedido } = req.params;
     const { nombre, descripcion } = req.body;
     try {
-        const fechaIncioEstado = Date.now();
+        const today= Date.now();
+        const fechaInicioEstado = new Date (today);
         const newEstadoPedido = await EstadoPedidos.create({
             idPedido,
             nombre,
-            fechaIncioEstado,
+            fechaInicioEstado,
             descripcion
         });
         if (newEstadoPedido) {
@@ -324,8 +377,9 @@ controller.getFinishEstado = async (req, res) => {
                 idEstado
             }
         });
-        if (oldEstadoPedido.fechaFinEstado) {
-            const fechaFinEstado = Date.now();
+        if (!oldEstadoPedido.fechaFinEstado) {
+            const today= Date.now();
+            const fechaFinEstado = new Date (today);
             await EstadoPedidos.update({
                 fechaFinEstado
             },
@@ -375,12 +429,13 @@ controller.getFinishEstado = async (req, res) => {
         });
     }
 };
+
 /*######################################### ItemPedido API REST #########################################*/
 /*--- Create of ItemPedido by Pedido ---*/
 controller.newItemPedidos = async (req, res) => {
     const { idPedido } = req.params;
     try {
-        const newItemPedido = ItemPedido.create({
+        const newItemPedido = await ItemPedido.create({
             idPedido
         });
         if (newItemPedido) {
@@ -479,7 +534,7 @@ controller.getItemById = async (req, res) => {
 /*--- Add pote by ItemPedido  ---*/
 controller.addPote = async (req, res) => {
     const {idPedido, idItemPedido}=req.params;
-    const { idPote, cantidad } = req.params;
+    const { idPote, descripcion } = req.body;
     try {
         const pote = await Potes.findOne({
             where:{
@@ -487,9 +542,11 @@ controller.addPote = async (req, res) => {
             }
         });
         if(pote){
+            const cantidad = 1;
             await ItemPedido.update({
                 idPote,
-                cantidad
+                cantidad,
+                descripcion
             },
             {
                 where:{
@@ -518,7 +575,7 @@ controller.addPote = async (req, res) => {
 /*--- Add producto by ItemPedido  ---*/
 controller.addProducto = async (req, res) => {
     const {idPedido, idItemPedido}=req.params;
-    const { idProducto, cantidad } = req.params;
+    const { idProducto, descripcion} = req.body;
     try {
         const producto = await Producto.findOne({
             where:{
@@ -526,9 +583,11 @@ controller.addProducto = async (req, res) => {
             }
         });
         if(producto){
+            const cantidad = 1;
             await ItemPedido.update({
                 idProducto,
-                cantidad
+                cantidad,
+                descripcion
             },
             {
                 where:{
@@ -554,6 +613,7 @@ controller.addProducto = async (req, res) => {
         });
     }
 };
+/*--- Calculate Total Price by pedido  ---*/
 controller.calculatepriceItem = async (req,res)=>{
     const {idPedido, idItemPedido} = req.params;
     try{
@@ -567,7 +627,7 @@ controller.calculatepriceItem = async (req,res)=>{
         //si el item es sobre un producto
         if(itemPedido.idProducto){
             const idProducto = itemPedido.idProducto;
-            const producto = Producto.findOne({
+            const producto = await Producto.findOne({
                 where:{
                     idProducto
                 }
@@ -590,17 +650,52 @@ controller.calculatepriceItem = async (req,res)=>{
                 }
             });
             res.json({
-                message:'The ItemPedido has been updateed',
+                message:'The ItemPedido has been updated',
                 data:updateItemPedido
             });
         };
         //Si el item es sobre un pote de helado
         if(itemPedido.idPote){
-
+            const idPote = itemPedido.idPote;
+            const pote = await Potes.findOne({
+                where:{
+                    idPote
+                }
+            });
+            const weight = pote.tamanio;
+            const constante_pote = await Constante_pote.findOne({
+                where:{
+                    weight
+                }
+            });
+            const cantidad = itemPedido.cantidad;
+            const precio = constante_pote.price;
+            const precioTotal = precio*cantidad;
+            await ItemPedido.update({
+                precioTotal
+            },
+            {
+                where:{
+                    idPedido,
+                    idItemPedido
+                }
+            });
+            const updateItemPedido = await ItemPedido.findOne({
+                where:{
+                    idPedido,
+                    idItemPedido
+                }
+            });
+            res.json({
+                message:'The ItemPedido has been updated',
+                data:updateItemPedido
+            });
         };
-        return res.json({
-            error:'The itemPedido has not been linked producto or pote'
-        });
+        if(!ItemPedido.idPote && ItemPedido.idProducto){
+            return res.json({
+                error:'The itemPedido has not been linked producto or pote'
+            });
+        }
     }catch(error){
         console.log(error);
         return res.json({
@@ -608,8 +703,80 @@ controller.calculatepriceItem = async (req,res)=>{
         });
     }
 };
-
+/*--- Change cantidad item Pedido by Pedido ---*/
+controller.changeQuantity = async (req,res)=>{
+    const {idPedido, idItemPedido}=req.params;
+    const { cantidad } = req.body;
+    try{
+        if(cantidad <= 0){
+            res.json({
+                error:'The cantidad isnt can zero or negative'
+            })
+        };
+        await ItemPedido.update({
+            cantidad
+        },
+        {
+            where:{
+                idPedido,
+                idItemPedido
+            }
+        });
+        const itemPedido = await ItemPedido.findOne({
+            where:{
+                idPedido,
+                idItemPedido
+            }
+        });
+        return res.json({
+            message:'The cantidad has been updated',
+            data:itemPedido
+        });
+    }catch(error){
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        }); 
+    }
+};
+controller.getItemContent = async (req,res)=>{
+    const {idPedido, idItemPedido} = req.params;
+    try{
+        const itemPedido = await ItemPedido.findOne({
+            where:{
+                idPedido,
+                idItemPedido
+            }
+        });
+        if(itemPedido.idPote){
+            const pote = await Potes.findOne({
+                where:{
+                    idPote:itemPedido.idPote
+                }
+            });
+            return res.send({
+                data:pote
+            });          
+        };
+        if(itemPedido.idProducto){
+            const producto = await Producto.findOne({
+                where:{
+                    idProducto:itemPedido.idProducto
+                }
+            });
+            return res.send({
+                data:producto
+            });          
+        };
+        return res.json({
+            error:'The item has no content'
+        });
+    }catch(error){
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });   
+    }
+};
 /*#######################################################################################################*/
-
-
 module.exports = controller;

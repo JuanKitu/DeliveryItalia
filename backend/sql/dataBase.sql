@@ -11,7 +11,6 @@ CREATE TABLE producto(
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
     precio real NOT NULL,
-    foto BYTEA,
     PRIMARY KEY("idProducto")
 );
 
@@ -39,9 +38,10 @@ CREATE TABLE sucursales(
 );
 
 CREATE TABLE cuentas(
-    "idCuenta" INT NOT NULL,
+    "idCuenta" SERIAL NOT NULL,
     email VARCHAR(50) NOT NULL,
     password VARCHAR NOT NULL,
+    salt VARCHAR,
     PRIMARY KEY("idCuenta")
 );
 
@@ -135,10 +135,10 @@ CREATE TABLE "itemPedido"(
 );
 
 CREATE TABLE "estadoPedido"(
-    "idEstado" serial NOT NULL,
+    "idEstado" SERIAL NOT NULL,
     nombre VARCHAR(50) NOT NULL,
     "fechaInicioEstado" TIMESTAMP WITH TIME ZONE NOT NULL,
-    "fechaFinEstado" TIMESTAMP WITH TIME ZONE NOT NULL,
+    "fechaFinEstado" TIMESTAMP WITH TIME ZONE,
     descripcion TEXT,
     "idPedido" int NOT NULL,
     PRIMARY KEY("idEstado", "idPedido"),
@@ -150,3 +150,23 @@ CREATE TABLE "medioPago"(
     descripcion TEXT,
     PRIMARY KEY ("idMedioPago")
 );
+CREATE TABLE "precioDelivery"(
+    "idPrecioDelivery" SERIAL NOT NULL,
+    "idSucursal" INT NOT NULL,
+    nombre VARCHAR(50),
+    "precioDelivery" REAL,
+    PRIMARY KEY("idPrecioDelivery","idSucursal"),
+    FOREIGN KEY("idSucursal") REFERENCES sucursales
+);
+
+--######## constantes para el programa ########
+CREATE TABLE constante_pote(
+    "idConstantePote" SERIAL NOT NULL,
+    weight REAL,
+    price REAL,
+    "maxQuantity" INT,
+    PRIMARY KEY ("idConstantePote")   
+);
+
+
+--#############################################

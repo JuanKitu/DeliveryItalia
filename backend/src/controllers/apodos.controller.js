@@ -7,9 +7,6 @@ controller.new = async (req, res) => {
         const newApodo = await Apodos.create({
             nombreCalle,
             idCalle
-        },
-        {
-            fields: ['nombreCalle','idCalle']
         });
         if(newApodo){
             return res.json({
@@ -27,9 +24,7 @@ controller.new = async (req, res) => {
 /*--- Query a apodo ---*/
 controller.getAll = async (req, res) => {
     try {
-        apodos = await Apodos.findAll({
-            attributes: ['idNombreCalle','nombreCalle','idCalle']
-        });
+        apodos = await Apodos.findAll();
         return res.json({
             data:apodos
         });
@@ -53,9 +48,6 @@ controller.change = async (req, res) => {
             where:{
                 idNombreCalle
             },
-        },
-        {
-            fields: ['idNombreCalle','nombreCalle','idCalle']
         });
         const apodo = await Apodos.findOne({
             where:{

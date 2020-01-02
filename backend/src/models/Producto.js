@@ -15,9 +15,6 @@ const Producto = sequelize.define('producto',{
     },
     precio:{
         type:Sequelize.REAL
-    },
-    foto:{
-        type:Sequelize.STRING
     }
 },{
     timestamps: false,

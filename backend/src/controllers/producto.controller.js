@@ -23,18 +23,16 @@ controller.new = async (req, res) => {
             nombre,
             descripcion,
             precio
-        }, {
-            fields: ['nombre', 'descripcion', 'precio']
         });
 
         //Este bloque seria para subir una imagen de producto, todavia es una beta
-        fileName = newProducto.idProducto;
-        upload(req, res, async function (err) {
-            res.json({
-                success: true,
-                menssage: 'image upload!'
-            });
-        });
+        // fileName = newProducto.idProducto;
+        // upload(req, res, async function (err) {
+        //     res.json({
+        //         success: true,
+        //         menssage: 'image upload!'
+        //     });
+        // });
         //termina el bloque
 
         if (newProducto) {

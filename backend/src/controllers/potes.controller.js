@@ -2,18 +2,16 @@ const controller = {};
 const Potes = require('../models/Potes.js');
 const GustosEnPotes = require('../models/GustosEnPotes');
 const Gustos = require('../models/Gustos.js');
-
+const Constante_pote = require('../models/Constante_pote.js');
 
 /*--- Create a pote ---*/
 controller.new = async (req, res) => {
-    const { cantidad, tamanio, cantidadMaxima } = req.body;
+    const { tamanio } = req.body;
+    const cantidad = 0;// el valor por default debe ser 0
     try {
         const newPote = await Potes.create({
-            cantidad,// el valor por default debe ser 0
-            tamanio,
-            cantidadMaxima
-        }, {
-            fields: ['cantidad', 'tamanio', 'cantidadMaxima']
+            cantidad,
+            tamanio
         });
         if (newPote) {
             return res.json({
@@ -33,9 +31,7 @@ controller.new = async (req, res) => {
 /*--- Query of pote ---*/
 controller.getAll = async (req, res) => {
     try {
-        const pote = await Potes.findAll({
-            attributes: ['idPote', 'tamanio', 'cantidad', 'cantidadMaxima']
-        });
+        const pote = await Potes.findAll();
         return res.json({
             data: pote
         });
@@ -50,11 +46,10 @@ controller.getAll = async (req, res) => {
 controller.change = async (req, res) => {
     try {
         const { idPote } = req.params;
-        const { tamanio, cantidad, cantidadMaxima } = req.body;
+        const { tamanio, cantidad } = req.body;
         const newPote = await Potes.update({
             tamanio,
-            cantidad,
-            cantidadMaxima
+            cantidad
         },
             {
                 where: {
@@ -62,7 +57,6 @@ controller.change = async (req, res) => {
                 }
             });
         const pote = await Potes.findOne({
-            attributes: ['idPote', 'tamanio', 'cantidad', 'cantidadMaxima'],
             where: {
                 idPote
             }
@@ -118,8 +112,7 @@ controller.getById = async (req, res) => {
         const pote = await Potes.findOne({
             where: {
                 idPote
-            },
-            attributes: ['idPote', 'tamanio', 'cantidad', 'cantidadMaxima']
+            }
         });
         return res.json({
             data: pote
@@ -150,8 +143,7 @@ controller.getGustos = async (req, res) => {
             const gustoAux = await Gustos.findOne({
                 where: {
                     idGusto
-                },
-                attributes: ['idGusto', 'nombre', 'descripcion', 'disponible', 'idCategoria']
+                }
             });
             gusto.push(gustoAux);
         }
@@ -166,24 +158,24 @@ controller.getGustos = async (req, res) => {
         });
     };
 };
-controller.getGustoEnPotes = async (req,res)=>{
-    const {idPote,idGusto}= req.params;
-    try{
+controller.getGustoEnPotes = async (req, res) => {
+    const { idPote, idGusto } = req.params;
+    try {
         const gustoEnPotes = await GustosEnPotes.findOne({
-            where:{
+            where: {
                 idPote,
                 idGusto
             }
         });
         return res.json({
-            data:gustoEnPotes
+            data: gustoEnPotes
         });
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return res.json({
             error: 'The server has been error',
             data: {}
-        })  
+        })
     }
 }
 /*--- add gusto pote ---*/
@@ -195,10 +187,16 @@ controller.addGusto = async (req, res) => {
             where: {
                 idPote
             },
-            attributes: ['idPote', 'cantidad', 'cantidadMaxima']
+            attributes: ['idPote', 'cantidad', 'tamanio']
         });
-
-        if (pote.cantidad < pote.cantidadMaxima) {
+        const weight = pote.tamanio;
+        const constante_pote = await Constante_pote.findOne({
+            where: {
+                weight 
+            }
+        });
+        const cantidadMaxima = constante_pote.maxQuantity;
+        if (pote.cantidad < cantidadMaxima) {
             const gustoEnPote = await GustosEnPotes.findOne({
                 where: {
                     idGusto,
@@ -238,14 +236,13 @@ controller.addGusto = async (req, res) => {
                 where: {
                     idGusto,
                     idPote
-                },
-                attributes: ['idGusto', 'idPote', 'vecesUsado']
+                }
             })
             return res.json({
                 message: 'The gusto has been asignate by pote',
                 data: consultaGustoEnPote
             })
-        }else {
+        } else {
             return res.json({
                 message: 'the maximum amount of tastes has been reached',
                 data: []
@@ -269,12 +266,16 @@ controller.deleteGusto = async (req, res) => {
             where: {
                 idPote
             },
-            attributes: ['idPote', 'cantidad', 'cantidadMaxima']
+            attributes: ['idPote', 'cantidad', 'tamanio']
         });
-        console.log(pote.cantidad);
-        console.log("<=");
-        console.log(pote.cantidadMaxima);
-        if (pote.cantidad <= pote.cantidadMaxima) {
+        const weight = pote.tamanio;
+        const constante_pote = await Constante_pote.findOne({
+            where: {
+                weight 
+            }
+        });
+        const cantidadMaxima = constante_pote.maxQuantity;
+        if (pote.cantidad <= cantidadMaxima) {
             const gustoSeleccionado = await Gustos.findOne({
                 where: {
                     idGusto
@@ -285,8 +286,7 @@ controller.deleteGusto = async (req, res) => {
                 where: {
                     idGusto,
                     idPote
-                },
-                attributes: ['idGusto', 'idPote', 'vecesUsado']
+                }
             })
             if (gustoEnPote && gustoEnPote.vecesUsado > 1) {
                 const dissVecesUsado = gustoEnPote.vecesUsado - 1;
@@ -310,12 +310,12 @@ controller.deleteGusto = async (req, res) => {
                         }
                     })
             } else if (gustoEnPote) {
-                GustosEnPotes.destroy({
+                const deleteRowCount = await GustosEnPotes.destroy({
                     where: {
                         idGusto,
                         idPote
                     }
-                })
+                });
                 const dissCantidad = pote.cantidad - 1;
                 await Potes.update({
                     cantidad: dissCantidad,
@@ -324,14 +324,17 @@ controller.deleteGusto = async (req, res) => {
                         where: {
                             idPote
                         }
-                    })
+                    });
+                    return res.json({
+                        message: 'The Gusto has been deleted by pote',
+                        countItemPedido: deleteRowCount,
+                    });
             }
             const consultaGustoEnPote = await GustosEnPotes.findOne({
                 where: {
                     idGusto,
                     idPote
-                },
-                attributes: ['idGusto', 'idPote', 'vecesUsado']
+                }
             })
             return res.json({
                 message: 'The gusto has been deleted by pote',

@@ -2,6 +2,8 @@
 const config = require('../config/const');
 const services = require('../services/token');
 const Cuentas = require('../models/Cuentas');
+const crypto = require('crypto');
+
 /**
  * @description se encarga de verificar si se tiene permiso para entrar a una ruta dada
  */
@@ -32,15 +34,21 @@ module.exports = async function (req, res, next) {
 
     res.cookie('autorization', newAutorization);
     let cuenta = await Cuentas.findOne({ where: { idCuenta: payload.sub } });
-
-    // Verificamos si es una ruta para admines.
-    if (config.ROUTES_ADMIN.some(common => route.indexOf(common) === 0)) {
-        console.log('ruta admin');
-        if (cuenta.userType > 1) {
-            return next();
+    console.log(payload.pwd, cuenta.password);
+    /* Verificamos si la contraseña cambio */
+    if (payload.pwd == cuenta.password) {
+        // Verificamos si es una ruta para admines.
+        if (config.ROUTES_ADMIN.some(common => route.indexOf(common) === 0)) {
+            console.log('ruta admin');
+            if (cuenta.userType > 1) {
+                return next();
+            } else {
+                return res.send('no tiene permiso para estar aqui');
+            }
         } else {
-            return res.send('no tiene permiso para estar aqui');
+            return next();
         }
+    } else {
+        return res.clearCookie("autorization").send('la contraseña cambio');
     }
-    return next();
 };

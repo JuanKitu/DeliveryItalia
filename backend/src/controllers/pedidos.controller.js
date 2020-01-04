@@ -5,14 +5,23 @@ const Sucursales = require('../models/Sucursales.js');
 const Clientes = require('../models/Clientes.js');
 const Potes = require('../models/Potes.js');
 const Producto = require('../models/Producto.js');
+const Cuentas = require('../models/Cuentas.js');
 const Constante_pote = require('../models/Constante_pote.js');
+const GustosEnPotes = require('../models/GustosEnPotes.js');
 const controller = {};
 const process = require('process');
 process.env.TZ = 'UTC-3';
 /*--- Create of pedido ---*/
 controller.new = async (req, res) => {
-    const { fechaPedido, cuit, idDomicilio, idCliente, idSucursal, idMedioPago, descripcion } = req.body;
+    const idCuenta = req.payload.sub
+    const { fechaPedido, cuit, idDomicilio, idSucursal, idMedioPago, descripcion } = req.body;
     try {
+        const cliente = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const idCliente = cliente.idCliente;
         const [day, month, year] = fechaPedido.split("-");//I destruct the string to accommodate the format of the date at ease :)
         const newFechaPedido = new Date(year, month - 1, day);//No se porque pero siempre te hace un mes adelantado
         const newPedido = await Pedidos.create({
@@ -39,8 +48,19 @@ controller.new = async (req, res) => {
 };
 /*--- Query of pedido ---*/
 controller.getAll = async (req, res) => {
+    const idCuenta = req.payload.sub;
     try {
-        const pedidos = await Pedidos.findAll();
+        const cliente = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const idCliente = cliente.idCliente;
+        const pedidos = await Pedidos.findAll({
+            where: {
+                idCliente
+            }
+        });
         return res.json({
             data: pedidos
         });
@@ -53,19 +73,44 @@ controller.getAll = async (req, res) => {
 };
 /*--- Edit of pedido ---*/
 controller.change = async (req, res) => {
+    const idCuenta = req.payload.sub;
     const { idPedido } = req.params;
-    const { fechaPedido, montoTotal, cuit, idDomicilio, idCliente, idSucursal, idMedioPago, descripcion } = req.body;
+    const { fechaPedido, montoTotal, cuit, idDomicilio, idSucursal, idMedioPago, descripcion } = req.body;
     const [day, month, year] = fechaPedido.split("-");//I destruct the string to accommodate the format of the date at ease :)
-    console.log(year);
     const newFechaPedido = new Date(year, month - 1, day, 0, 0, 0);
-    console.log(newFechaPedido);
     try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
         await Pedidos.update({
             fechaPedido: newFechaPedido,
             montoTotal,
             cuit,
             idDomicilio,
-            idCliente,
             idSucursal,
             idMedioPago,
             descripcion
@@ -93,9 +138,36 @@ controller.change = async (req, res) => {
 };
 /*--- Delete of pedido ---*/
 controller.delete = async (req, res) => {
+    const idCuenta = req.payload.sub;
+    const { idPedido } = req.params;
     try {
-        const { idPedido } = req.params;
-
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
         const deleteRowCountPedido = await Pedidos.destroy({
             where: {
                 idPedido
@@ -127,8 +199,36 @@ controller.delete = async (req, res) => {
 };
 /*--- Find of pedido ---*/
 controller.getById = async (req, res) => {
+    const idCuenta = req.payload.sub;
     const { idPedido } = req.params
     try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
         const pedido = await Pedidos.findOne({
             where: {
                 idPedido
@@ -146,8 +246,36 @@ controller.getById = async (req, res) => {
 };
 /*--- Find Sucursal by pedido ---*/
 controller.getSucursal = async (req, res) => {
+    const idCuenta = req.payload.sub;
     const { idPedido } = req.params;
     try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
         const pedido = await Pedidos.findOne({
             where: {
                 idPedido
@@ -172,8 +300,36 @@ controller.getSucursal = async (req, res) => {
 };
 /*--- Find Cliente by pedido ---*/
 controller.getCliente = async (req, res) => {
+    const idCuenta = req.payload.sub;
     const { idPedido } = req.params;
     try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
         const pedido = await Pedidos.findOne({
             where: {
                 idPedido
@@ -196,50 +352,78 @@ controller.getCliente = async (req, res) => {
     }
 };
 /*--- Calculate Total Amuont of pedido  ---*/
-controller.calculateTotalAmount = async (req,res)=>{
-    const {idPedido} = req.params;
-    try{
-        itemsPedidos = await ItemPedido.findAll({
-            where:{
+controller.calculateTotalAmount = async (req, res) => {
+    const idCuenta = req.payload.sub;
+    const { idPedido } = req.params;
+    try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
                 idPedido
             }
         });
-        for(let inc = 0;inc<itemsPedidos.length;inc++){
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
+        itemsPedidos = await ItemPedido.findAll({
+            where: {
+                idPedido
+            }
+        });
+        for (let inc = 0; inc < itemsPedidos.length; inc++) {
             const auxPrecioTotal = itemsPedidos[inc].precioTotal;
             //verificamos que el precio total tenga un valor valido
-            if(!auxPrecioTotal){
-                if(auxPrecioTotal <= 0){
+            if (!auxPrecioTotal) {
+                if (auxPrecioTotal <= 0) {
                     res.json({
-                        error:'missing items of the car',
-                        data:[]
+                        error: 'missing items of the car',
+                        data: []
                     });
                 };
             };
         };
         let montoTotal = 0;
-        for(let inc = 0;inc<itemsPedidos.length;inc++){
+        for (let inc = 0; inc < itemsPedidos.length; inc++) {
             const auxPrecioTotal = itemsPedidos[inc].precioTotal;
             montoTotal = montoTotal + auxPrecioTotal;
         };
-        
+
         await Pedidos.update({
             montoTotal
         },
-        {
-            where:{
-                idPedido
-            }
-        });
+            {
+                where: {
+                    idPedido
+                }
+            });
         const pedido = await Pedidos.findOne({
-            where:{
+            where: {
                 idPedido
             }
         });
         res.json({
-            message:'The monto total has been updated',
-            data:pedido
+            message: 'The monto total has been updated',
+            data: pedido
         });
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return res.json({
             error: 'The server has been error'
@@ -249,11 +433,39 @@ controller.calculateTotalAmount = async (req,res)=>{
 /*######################################## EstadoPèdido API REST ########################################*/
 /*--- Create of EstadoPedido ---*/
 controller.newEstadoPedido = async (req, res) => {
+    const idCuenta = req.payload.sub;
     const { idPedido } = req.params;
     const { nombre, descripcion } = req.body;
     try {
-        const today= Date.now();
-        const fechaInicioEstado = new Date (today);
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
+        const today = Date.now();
+        const fechaInicioEstado = new Date(today);
         const newEstadoPedido = await EstadoPedidos.create({
             idPedido,
             nombre,
@@ -275,8 +487,36 @@ controller.newEstadoPedido = async (req, res) => {
 };
 /*--- Find All EstadoPedidos ---*/
 controller.getAllEstadosPedidos = async (req, res) => {
+    const idCuenta = req.payload.sub;
     const { idPedido } = req.params;
     try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
         const estadoPedidos = await EstadoPedidos.findAll({
             where: {
                 idPedido
@@ -294,9 +534,37 @@ controller.getAllEstadosPedidos = async (req, res) => {
 };
 /*--- Edit of EstadoPedido ---*/
 controller.changeEstadoPedidos = async (req, res) => {
+    const idCuenta = req.payload.sub;
     const { idPedido, idEstado } = req.params;
     const { nombre, descripcion } = req.body;
     try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
         const fechaIncioEstado = Date.now();
         await EstadoPedidos.update({
             nombre,
@@ -328,8 +596,36 @@ controller.changeEstadoPedidos = async (req, res) => {
 };
 /*--- Delete of EstadoPedido ---*/
 controller.deleteEstadoPedidos = async (req, res) => {
+    const idCuenta = re.payload.sub;
+    const { idEstado, idPedido } = req.params;
     try {
-        const { idEstado, idPedido } = req.params;
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
         const deleteRowCount = await EstadoPedidos.destroy({
             where: {
                 idEstado,
@@ -349,8 +645,36 @@ controller.deleteEstadoPedidos = async (req, res) => {
 };
 /*--- Find One EstadoPedido ---*/
 controller.getEstadoById = async (req, res) => {
+    const idCuenta = req.payload.sub;
     const { idPedido, idEstado } = req.params;
     try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
         const estadoPedido = await EstadoPedidos.findOne({
             where: {
                 idPedido,
@@ -369,8 +693,36 @@ controller.getEstadoById = async (req, res) => {
 };
 /*--- Finsh/notFiinish EstadoPedido ---*/
 controller.getFinishEstado = async (req, res) => {
+    const idCuenta = req.payload.sub;
     const { idPedido, idEstado } = req.params;
     try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
         const oldEstadoPedido = await EstadoPedidos.findOne({
             where: {
                 idPedido,
@@ -378,8 +730,8 @@ controller.getFinishEstado = async (req, res) => {
             }
         });
         if (!oldEstadoPedido.fechaFinEstado) {
-            const today= Date.now();
-            const fechaFinEstado = new Date (today);
+            const today = Date.now();
+            const fechaFinEstado = new Date(today);
             await EstadoPedidos.update({
                 fechaFinEstado
             },
@@ -433,6 +785,1063 @@ controller.getFinishEstado = async (req, res) => {
 /*######################################### ItemPedido API REST #########################################*/
 /*--- Create of ItemPedido by Pedido ---*/
 controller.newItemPedidos = async (req, res) => {
+    const idCuenta = req.payload.sub;
+    const { idPedido } = req.params;
+    try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
+        const newItemPedido = await ItemPedido.create({
+            idPedido
+        });
+        if (newItemPedido) {
+            return res.json({
+                message: 'The ItemPedido has been created',
+                data: newItemPedido
+            });
+        };
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Delete of ItemPedido by Pedido ---*/
+controller.deleteItemPedidos = async (req, res) => {
+    const idCuenta = reqp.payload.sub;
+    const { idItemPedido, idPedido } = req.params;
+    try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
+        const itemPedido = await ItemPedido.findOne({
+            where: {
+                idItemPedido,
+                idPedido
+            }
+        });
+        const idPote = itemPedido.idPote;
+        const deleteRowCountItemPedido = await ItemPedido.destroy({
+            where: {
+                idItemPedido,
+                idPedido
+            }
+        });
+        if (idPote) {
+            const deleteRowCountPotes = await Potes.destroy({
+                where: {
+                    idPote
+                }
+            });
+            return res.json({
+                message: 'The ItemPedido has been deleted',
+                countItemPedido: deleteRowCountItemPedido,
+                countPotes: deleteRowCountPotes,
+            });
+        }
+        return res.json({
+            message: 'The ItemPedido has been deleted',
+            countItemPedido: deleteRowCountItemPedido,
+            countPotes: null
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Find All ItemPedidos ---*/
+controller.getAllItemPedidos = async (req, res) => {
+    const idCuenta = req.payload.sub;
+    const { idPedido } = req.params;
+    try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
+        const itemPedido = await ItemPedido.findAll({
+            where: {
+                idPedido
+            }
+        });
+        res.json({
+            data: itemPedido
+        })
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Find One ItemPedido ---*/
+controller.getItemById = async (req, res) => {
+    const idCuenta = req.payload.sub;
+    const { idPedido, idItemPedido } = req.params;
+    try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
+        const itemPedido = await ItemPedido.findOne({
+            where: {
+                idPedido,
+                idItemPedido
+            }
+        });
+        return res.json({
+            data: itemPedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Add pote by ItemPedido  ---*/
+controller.addPote = async (req, res) => {
+    const idCuenta = req.payload.sub;
+    const { idPedido, idItemPedido } = req.params;
+    const { descripcion , tamanio } = req.body;
+    try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
+        const controlItemPedido = await ItemPedido.findOne({
+            where: {
+                idPedido,
+                idItemPedido
+            }
+        });
+        if(controlItemPedido.idPote){
+            await ItemPedido.update({
+                idPote:null,
+            },
+            {
+                where: {
+                    idPedido,
+                    idItemPedido
+                }   
+            });
+            const deleteRowCountGusto = await GustosEnPotes.destroy({
+                where: {
+                    idPote:controlItemPedido.idPote
+                }
+            });
+            const deleteRowCountPote = await Potes.destroy({
+                where: {
+                    idPote:controlItemPedido.idPote
+                }
+            });
+            return res.json({
+                message: 'The pote has been deleted',
+                countPote: deleteRowCountPote,
+                countGusto: deleteRowCountGusto
+            });
+        };
+        const newPote = await Potes.create({
+            cantidad:0,
+            tamanio
+        });
+        //console.log(newPote)
+        if(newPote){
+            const idPote = newPote.idPote;
+            await ItemPedido.update({
+                idPote,
+                descripcion
+            },
+            {
+                where: {
+                    idPedido,
+                    idItemPedido
+                }   
+            });
+        };
+            const itemPedido = await ItemPedido.findOne({
+                where: {
+                    idPedido,
+                    idItemPedido
+                }
+            });
+            res.json({
+                message: 'The Pote has been Created to ItemPedido',
+                dataItemPedido: itemPedido,
+                dataPote: newPote
+            });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Add producto by ItemPedido  ---*/
+controller.addProducto = async (req, res) => {
+    const idCuenta = req.payload.sub;
+    const { idPedido, idItemPedido } = req.params;
+    const { idProducto, descripcion } = req.body;
+    try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
+        const producto = await Producto.findOne({
+            where: {
+                idProducto
+            }
+        });
+        if (producto) {
+            const cantidad = 1;
+            await ItemPedido.update({
+                idProducto,
+                cantidad,
+                descripcion
+            },
+                {
+                    where: {
+                        idPedido,
+                        idItemPedido
+                    }
+                });
+            const itemPedido = await ItemPedido.findOne({
+                where: {
+                    idPedido,
+                    idItemPedido
+                }
+            });
+            res.json({
+                message: 'The Producto has been added to ItemPedido',
+                data: itemPedido
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Calculate Total Price by pedido  ---*/
+controller.calculatepriceItem = async (req, res) => {
+    const idCuenta = req.payload.sub;
+    const { idPedido, idItemPedido } = req.params;
+    try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
+        const itemPedido = await ItemPedido.findOne({
+            where: {
+                idPedido,
+                idItemPedido
+            }
+        });
+        const cantidad = itemPedido.cantidad;
+        //si el item es sobre un producto
+        if (itemPedido.idProducto) {
+            const idProducto = itemPedido.idProducto;
+            const producto = await Producto.findOne({
+                where: {
+                    idProducto
+                }
+            });
+            const precio = producto.precio;
+            const precioTotal = precio * cantidad;
+            await ItemPedido.update({
+                precioTotal
+            },
+                {
+                    where: {
+                        idPedido,
+                        idItemPedido
+                    }
+                });
+            const updateItemPedido = await ItemPedido.findOne({
+                where: {
+                    idPedido,
+                    idItemPedido
+                }
+            });
+            res.json({
+                message: 'The ItemPedido has been updated',
+                data: updateItemPedido
+            });
+        };
+        //Si el item es sobre un pote de helado
+        if (itemPedido.idPote) {
+            const idPote = itemPedido.idPote;
+            const pote = await Potes.findOne({
+                where: {
+                    idPote
+                }
+            });
+            const weight = pote.tamanio;
+            const constante_pote = await Constante_pote.findOne({
+                where: {
+                    weight
+                }
+            });
+            const cantidad = itemPedido.cantidad;
+            const precio = constante_pote.price;
+            const precioTotal = precio * cantidad;
+            await ItemPedido.update({
+                precioTotal
+            },
+                {
+                    where: {
+                        idPedido,
+                        idItemPedido
+                    }
+                });
+            const updateItemPedido = await ItemPedido.findOne({
+                where: {
+                    idPedido,
+                    idItemPedido
+                }
+            });
+            res.json({
+                message: 'The ItemPedido has been updated',
+                data: updateItemPedido
+            });
+        };
+        if (!ItemPedido.idPote && ItemPedido.idProducto) {
+            return res.json({
+                error: 'The itemPedido has not been linked producto or pote'
+            });
+        }
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Change cantidad item Pedido by Pedido ---*/
+controller.changeQuantity = async (req, res) => {
+    const idCuenta = req.payload.sub;
+    const { idPedido, idItemPedido } = req.params;
+    const { cantidad } = req.body;
+    try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
+        if (cantidad <= 0) {
+            res.json({
+                error: 'The cantidad isnt can zero or negative'
+            })
+        };
+        await ItemPedido.update({
+            cantidad
+        },
+            {
+                where: {
+                    idPedido,
+                    idItemPedido
+                }
+            });
+        const itemPedido = await ItemPedido.findOne({
+            where: {
+                idPedido,
+                idItemPedido
+            }
+        });
+        return res.json({
+            message: 'The cantidad has been updated',
+            data: itemPedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+controller.getItemContent = async (req, res) => {
+    const idCuenta = req.payload.sub;
+    const { idPedido, idItemPedido } = req.params;
+    try {
+        /*##################################### Control Permissions Pedidos #####################################*/
+        const controlPedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        if (!controlPedido) {
+            return res.json({
+                error: 'The Pedido dont exist'
+            });
+        };
+        const controlClientebyCuenta = await Clientes.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        const cuentas = await Cuentas.findOne({
+            where: {
+                idCuenta
+            }
+        });
+        if (!(cuentas.userTipe === 2) && !(controlClientebyCuenta.idCliente === controlPedido.idCliente)) {
+            return res.json({
+                error: 'Doesnt has permissions'
+            });
+        }
+        /*#######################################################################################################*/
+        const itemPedido = await ItemPedido.findOne({
+            where: {
+                idPedido,
+                idItemPedido
+            }
+        });
+        if (itemPedido.idPote) {
+            const pote = await Potes.findOne({
+                where: {
+                    idPote: itemPedido.idPote
+                }
+            });
+            return res.send({
+                data: pote
+            });
+        };
+        if (itemPedido.idProducto) {
+            const producto = await Producto.findOne({
+                where: {
+                    idProducto: itemPedido.idProducto
+                }
+            });
+            return res.send({
+                data: producto
+            });
+        };
+        return res.json({
+            error: 'The item has no content'
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*#######################################################################################################*/
+
+/*▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ Admin Pedidos API REST ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒*/
+
+/*--- Create of pedido ---*/
+controller.adminNew = async (req, res) => {
+    const { fechaPedido, cuit, idDomicilio, idCliente, idSucursal, idMedioPago, descripcion } = req.body;
+    try {
+        const [day, month, year] = fechaPedido.split("-");//I destruct the string to accommodate the format of the date at ease :)
+        const newFechaPedido = new Date(year, month - 1, day);//No se porque pero siempre te hace un mes adelantado
+        const newPedido = await Pedidos.create({
+            fechaPedido: newFechaPedido,
+            cuit,
+            idDomicilio,
+            idCliente,
+            idSucursal,
+            idMedioPago,
+            descripcion
+        });
+        if (newPedido) {
+            return res.json({
+                message: 'The Pedido has been created',
+                data: newPedido
+            });
+        };
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Query of pedido ---*/
+controller.adminGetAll = async (req, res) => {
+    try {
+        const pedidos = await Pedidos.findAll();
+        return res.json({
+            data: pedidos
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Edit of pedido ---*/
+controller.adminChange = async (req, res) => {
+    const { idPedido } = req.params;
+    const { fechaPedido, montoTotal, cuit, idDomicilio, idCliente, idSucursal, idMedioPago, descripcion } = req.body;
+    const [day, month, year] = fechaPedido.split("-");//I destruct the string to accommodate the format of the date at ease :)
+    console.log(year);
+    const newFechaPedido = new Date(year, month - 1, day, 0, 0, 0);
+    console.log(newFechaPedido);
+    try {
+        await Pedidos.update({
+            fechaPedido: newFechaPedido,
+            montoTotal,
+            cuit,
+            idDomicilio,
+            idCliente,
+            idSucursal,
+            idMedioPago,
+            descripcion
+        },
+            {
+                where: {
+                    idPedido
+                }
+            });
+        const pedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        return res.json({
+            message: 'The pedido has been changed',
+            data: pedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Delete of pedido ---*/
+controller.adminDelete = async (req, res) => {
+    try {
+        const { idPedido } = req.params;
+
+        const deleteRowCountPedido = await Pedidos.destroy({
+            where: {
+                idPedido
+            }
+        });
+        const deleteRowCountEstadoPedido = await EstadoPedido.destroy({
+            where: {
+                idPedido
+            }
+        });
+        const deleteRowCountItemPedido = await ItemPedido.destroy({
+            where: {
+                idPedido
+            }
+        });
+        return res.json({
+            message: 'The Pedido has been deleted',
+            countPedido: deleteRowCountPedido,
+            countEstadoPedido: deleteRowCountEstadoPedido,
+            countItemPedido: deleteRowCountItemPedido
+
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Find of pedido ---*/
+controller.adminGetById = async (req, res) => {
+    const { idPedido } = req.params
+    try {
+        const pedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        return res.json({
+            data: pedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Find Sucursal by pedido ---*/
+controller.adminGetSucursal = async (req, res) => {
+    const { idPedido } = req.params;
+    try {
+        const pedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        const idSucursal = pedido.idSucursal;
+        console.log(pedido);
+        const sucursal = await Sucursales.findOne({
+            where: {
+                idSucursal
+            }
+        });
+        res.json({
+            data: sucursal
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Find Cliente by pedido ---*/
+controller.adminGetCliente = async (req, res) => {
+    const { idPedido } = req.params;
+    try {
+        const pedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        const idCliente = pedido.idCliente;
+        const cliente = await Clientes.findOne({
+            where: {
+                idCliente
+            }
+        });
+        res.json({
+            data: cliente
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Calculate Total Amuont of pedido  ---*/
+controller.adminCalculateTotalAmount = async (req, res) => {
+    const { idPedido } = req.params;
+    try {
+        itemsPedidos = await ItemPedido.findAll({
+            where: {
+                idPedido
+            }
+        });
+        for (let inc = 0; inc < itemsPedidos.length; inc++) {
+            const auxPrecioTotal = itemsPedidos[inc].precioTotal;
+            //verificamos que el precio total tenga un valor valido
+            if (!auxPrecioTotal) {
+                if (auxPrecioTotal <= 0) {
+                    res.json({
+                        error: 'missing items of the car',
+                        data: []
+                    });
+                };
+            };
+        };
+        let montoTotal = 0;
+        for (let inc = 0; inc < itemsPedidos.length; inc++) {
+            const auxPrecioTotal = itemsPedidos[inc].precioTotal;
+            montoTotal = montoTotal + auxPrecioTotal;
+        };
+
+        await Pedidos.update({
+            montoTotal
+        },
+            {
+                where: {
+                    idPedido
+                }
+            });
+        const pedido = await Pedidos.findOne({
+            where: {
+                idPedido
+            }
+        });
+        res.json({
+            message: 'The monto total has been updated',
+            data: pedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*######################################## EstadoPèdido API REST ########################################*/
+/*--- Create of EstadoPedido ---*/
+controller.adminNewEstadoPedido = async (req, res) => {
+    const { idPedido } = req.params;
+    const { nombre, descripcion } = req.body;
+    try {
+        const today = Date.now();
+        const fechaInicioEstado = new Date(today);
+        const newEstadoPedido = await EstadoPedidos.create({
+            idPedido,
+            nombre,
+            fechaInicioEstado,
+            descripcion
+        });
+        if (newEstadoPedido) {
+            return res.json({
+                message: 'The estado has been created',
+                data: newEstadoPedido
+            });
+        };
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Find All EstadoPedidos ---*/
+controller.adminGetAllEstadosPedidos = async (req, res) => {
+    const { idPedido } = req.params;
+    try {
+        const estadoPedidos = await EstadoPedidos.findAll({
+            where: {
+                idPedido
+            }
+        });
+        return res.json({
+            data: estadoPedidos
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Edit of EstadoPedido ---*/
+controller.adminChangeEstadoPedidos = async (req, res) => {
+    const { idPedido, idEstado } = req.params;
+    const { nombre, descripcion } = req.body;
+    try {
+        const fechaIncioEstado = Date.now();
+        await EstadoPedidos.update({
+            nombre,
+            fechaIncioEstado,
+            descripcion
+        },
+            {
+                where: {
+                    idEstado,
+                    idPedido
+                }
+            });
+        const estadoPedido = await EstadoPedidos.findOne({
+            where: {
+                idEstado,
+                idPedido
+            }
+        });
+        return res.json({
+            message: 'The EstadoPedido has been changed',
+            data: estadoPedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Delete of EstadoPedido ---*/
+controller.adminDeleteEstadoPedidos = async (req, res) => {
+    try {
+        const { idEstado, idPedido } = req.params;
+        const deleteRowCount = await EstadoPedidos.destroy({
+            where: {
+                idEstado,
+                idPedido
+            }
+        });
+        return res.json({
+            message: 'The EstadoPedido has been deleted',
+            count: deleteRowCount,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    };
+};
+/*--- Find One EstadoPedido ---*/
+controller.adminGetEstadoById = async (req, res) => {
+    const { idPedido, idEstado } = req.params;
+    try {
+        const estadoPedido = await EstadoPedidos.findOne({
+            where: {
+                idPedido,
+                idEstado
+            }
+        });
+        return res.json({
+            data: estadoPedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+/*--- Finsh/notFiinish EstadoPedido ---*/
+controller.adminGetFinishEstado = async (req, res) => {
+    const { idPedido, idEstado } = req.params;
+    try {
+        const oldEstadoPedido = await EstadoPedidos.findOne({
+            where: {
+                idPedido,
+                idEstado
+            }
+        });
+        if (!oldEstadoPedido.fechaFinEstado) {
+            const today = Date.now();
+            const fechaFinEstado = new Date(today);
+            await EstadoPedidos.update({
+                fechaFinEstado
+            },
+                {
+                    where: {
+                        idPedido,
+                        idEstado
+                    }
+                });
+            const estadoPedido = await EstadoPedidos.findOne({
+                where: {
+                    idPedido,
+                    idEstado
+                }
+            });
+            return res.json({
+                message: 'The estado has been finished',
+                data: estadoPedido
+            });
+        };
+        //The estado already finished
+        const fechaFinEstado = null;
+        await EstadoPedidos.update({
+            fechaFinEstado
+        },
+            {
+                where: {
+                    idEstado,
+                    idPedido
+                }
+            });
+        //change value fechafinestado to null
+        const estadoPedido = await EstadoPedidos.findOne({
+            where: {
+                idPedido,
+                idEstado
+            }
+        });
+        return res.json({
+            message: 'The estado has not been finished',
+            data: estadoPedido
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            error: 'The server has been error'
+        });
+    }
+};
+
+/*######################################### ItemPedido API REST #########################################*/
+/*--- Create of ItemPedido by Pedido ---*/
+controller.adminNewItemPedidos = async (req, res) => {
     const { idPedido } = req.params;
     try {
         const newItemPedido = await ItemPedido.create({
@@ -452,7 +1861,7 @@ controller.newItemPedidos = async (req, res) => {
     }
 };
 /*--- Delete of ItemPedido by Pedido ---*/
-controller.deleteItemPedidos = async (req, res) => {
+controller.adminDeleteItemPedidos = async (req, res) => {
     try {
         const { idItemPedido, idPedido } = req.params;
         const itemPedido = await ItemPedido.findOne({
@@ -493,7 +1902,7 @@ controller.deleteItemPedidos = async (req, res) => {
     };
 };
 /*--- Find All ItemPedidos ---*/
-controller.getAllItemPedidos = async (req, res) => {
+controller.adminGetAllItemPedidos = async (req, res) => {
     const { idPedido } = req.params;
     try {
         const itemPedido = await ItemPedido.findAll({
@@ -512,7 +1921,7 @@ controller.getAllItemPedidos = async (req, res) => {
     }
 };
 /*--- Find One ItemPedido ---*/
-controller.getItemById = async (req, res) => {
+controller.adminGetItemById = async (req, res) => {
     const { idPedido, idItemPedido } = req.params;
     try {
         const itemPedido = await ItemPedido.findOne({
@@ -532,39 +1941,71 @@ controller.getItemById = async (req, res) => {
     }
 };
 /*--- Add pote by ItemPedido  ---*/
-controller.addPote = async (req, res) => {
-    const {idPedido, idItemPedido}=req.params;
-    const { idPote, descripcion } = req.body;
+controller.adminAddPote = async (req, res) => {
+    const { idPedido, idItemPedido } = req.params;
+    const { descripcion , tamanio } = req.body;
     try {
-        const pote = await Potes.findOne({
-            where:{
-                idPote
+        const controlItemPedido = await ItemPedido.findOne({
+            where: {
+                idPedido,
+                idItemPedido
             }
         });
-        if(pote){
-            const cantidad = 1;
+        if(controlItemPedido.idPote){
+            await ItemPedido.update({
+                idPote:null,
+            },
+            {
+                where: {
+                    idPedido,
+                    idItemPedido
+                }   
+            });
+            const deleteRowCountGusto = await GustosEnPotes.destroy({
+                where: {
+                    idPote:controlItemPedido.idPote
+                }
+            });
+            const deleteRowCountPote = await Potes.destroy({
+                where: {
+                    idPote:controlItemPedido.idPote
+                }
+            });
+            return res.json({
+                message: 'The pote has been deleted',
+                countPote: deleteRowCountPote,
+                countGusto: deleteRowCountGusto
+            });
+        };
+        const newPote = await Potes.create({
+            cantidad:0,
+            tamanio
+        });
+        //console.log(newPote)
+        if(newPote){
+            const idPote = newPote.idPote;
             await ItemPedido.update({
                 idPote,
-                cantidad,
                 descripcion
             },
             {
-                where:{
+                where: {
                     idPedido,
                     idItemPedido
-                }
+                }   
             });
+        };
             const itemPedido = await ItemPedido.findOne({
-                where:{
+                where: {
                     idPedido,
                     idItemPedido
                 }
             });
             res.json({
-                message:'The Pote has been added to ItemPedido',
-                data:itemPedido
+                message: 'The Pote has been Created to ItemPedido',
+                dataItemPedido: itemPedido,
+                dataPote: newPote
             });
-        }
     } catch (error) {
         console.log(error);
         return res.json({
@@ -573,37 +2014,37 @@ controller.addPote = async (req, res) => {
     }
 };
 /*--- Add producto by ItemPedido  ---*/
-controller.addProducto = async (req, res) => {
-    const {idPedido, idItemPedido}=req.params;
-    const { idProducto, descripcion} = req.body;
+controller.adminAddProducto = async (req, res) => {
+    const { idPedido, idItemPedido } = req.params;
+    const { idProducto, descripcion } = req.body;
     try {
         const producto = await Producto.findOne({
-            where:{
+            where: {
                 idProducto
             }
         });
-        if(producto){
+        if (producto) {
             const cantidad = 1;
             await ItemPedido.update({
                 idProducto,
                 cantidad,
                 descripcion
             },
-            {
-                where:{
-                    idPedido,
-                    idItemPedido
-                }
-            });
+                {
+                    where: {
+                        idPedido,
+                        idItemPedido
+                    }
+                });
             const itemPedido = await ItemPedido.findOne({
-                where:{
+                where: {
                     idPedido,
                     idItemPedido
                 }
             });
             res.json({
-                message:'The Producto has been added to ItemPedido',
-                data:itemPedido
+                message: 'The Producto has been added to ItemPedido',
+                data: itemPedido
             });
         }
     } catch (error) {
@@ -614,89 +2055,89 @@ controller.addProducto = async (req, res) => {
     }
 };
 /*--- Calculate Total Price by pedido  ---*/
-controller.calculatepriceItem = async (req,res)=>{
-    const {idPedido, idItemPedido} = req.params;
-    try{
+controller.adminCalculatepriceItem = async (req, res) => {
+    const { idPedido, idItemPedido } = req.params;
+    try {
         const itemPedido = await ItemPedido.findOne({
-            where:{
+            where: {
                 idPedido,
                 idItemPedido
             }
         });
         const cantidad = itemPedido.cantidad;
         //si el item es sobre un producto
-        if(itemPedido.idProducto){
+        if (itemPedido.idProducto) {
             const idProducto = itemPedido.idProducto;
             const producto = await Producto.findOne({
-                where:{
+                where: {
                     idProducto
                 }
             });
             const precio = producto.precio;
-            const precioTotal = precio*cantidad;
+            const precioTotal = precio * cantidad;
             await ItemPedido.update({
                 precioTotal
             },
-            {
-                where:{
-                    idPedido,
-                    idItemPedido
-                }
-            });
+                {
+                    where: {
+                        idPedido,
+                        idItemPedido
+                    }
+                });
             const updateItemPedido = await ItemPedido.findOne({
-                where:{
+                where: {
                     idPedido,
                     idItemPedido
                 }
             });
             res.json({
-                message:'The ItemPedido has been updated',
-                data:updateItemPedido
+                message: 'The ItemPedido has been updated',
+                data: updateItemPedido
             });
         };
         //Si el item es sobre un pote de helado
-        if(itemPedido.idPote){
+        if (itemPedido.idPote) {
             const idPote = itemPedido.idPote;
             const pote = await Potes.findOne({
-                where:{
+                where: {
                     idPote
                 }
             });
             const weight = pote.tamanio;
             const constante_pote = await Constante_pote.findOne({
-                where:{
+                where: {
                     weight
                 }
             });
             const cantidad = itemPedido.cantidad;
             const precio = constante_pote.price;
-            const precioTotal = precio*cantidad;
+            const precioTotal = precio * cantidad;
             await ItemPedido.update({
                 precioTotal
             },
-            {
-                where:{
-                    idPedido,
-                    idItemPedido
-                }
-            });
+                {
+                    where: {
+                        idPedido,
+                        idItemPedido
+                    }
+                });
             const updateItemPedido = await ItemPedido.findOne({
-                where:{
+                where: {
                     idPedido,
                     idItemPedido
                 }
             });
             res.json({
-                message:'The ItemPedido has been updated',
-                data:updateItemPedido
+                message: 'The ItemPedido has been updated',
+                data: updateItemPedido
             });
         };
-        if(!ItemPedido.idPote && ItemPedido.idProducto){
+        if (!ItemPedido.idPote && ItemPedido.idProducto) {
             return res.json({
-                error:'The itemPedido has not been linked producto or pote'
+                error: 'The itemPedido has not been linked producto or pote'
             });
         }
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return res.json({
             error: 'The server has been error'
@@ -704,79 +2145,81 @@ controller.calculatepriceItem = async (req,res)=>{
     }
 };
 /*--- Change cantidad item Pedido by Pedido ---*/
-controller.changeQuantity = async (req,res)=>{
-    const {idPedido, idItemPedido}=req.params;
+controller.adminChangeQuantity = async (req, res) => {
+    const { idPedido, idItemPedido } = req.params;
     const { cantidad } = req.body;
-    try{
-        if(cantidad <= 0){
+    try {
+        if (cantidad <= 0) {
             res.json({
-                error:'The cantidad isnt can zero or negative'
+                error: 'The cantidad isnt can zero or negative'
             })
         };
         await ItemPedido.update({
             cantidad
         },
-        {
-            where:{
-                idPedido,
-                idItemPedido
-            }
-        });
+            {
+                where: {
+                    idPedido,
+                    idItemPedido
+                }
+            });
         const itemPedido = await ItemPedido.findOne({
-            where:{
+            where: {
                 idPedido,
                 idItemPedido
             }
         });
         return res.json({
-            message:'The cantidad has been updated',
-            data:itemPedido
+            message: 'The cantidad has been updated',
+            data: itemPedido
         });
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return res.json({
             error: 'The server has been error'
-        }); 
+        });
     }
 };
-controller.getItemContent = async (req,res)=>{
-    const {idPedido, idItemPedido} = req.params;
-    try{
+controller.adminGetItemContent = async (req, res) => {
+    const { idPedido, idItemPedido } = req.params;
+    try {
         const itemPedido = await ItemPedido.findOne({
-            where:{
+            where: {
                 idPedido,
                 idItemPedido
             }
         });
-        if(itemPedido.idPote){
+        if (itemPedido.idPote) {
             const pote = await Potes.findOne({
-                where:{
-                    idPote:itemPedido.idPote
+                where: {
+                    idPote: itemPedido.idPote
                 }
             });
             return res.send({
-                data:pote
-            });          
+                data: pote
+            });
         };
-        if(itemPedido.idProducto){
+        if (itemPedido.idProducto) {
             const producto = await Producto.findOne({
-                where:{
-                    idProducto:itemPedido.idProducto
+                where: {
+                    idProducto: itemPedido.idProducto
                 }
             });
             return res.send({
-                data:producto
-            });          
+                data: producto
+            });
         };
         return res.json({
-            error:'The item has no content'
+            error: 'The item has no content'
         });
-    }catch(error){
+    } catch (error) {
         console.log(error);
         return res.json({
             error: 'The server has been error'
-        });   
+        });
     }
 };
 /*#######################################################################################################*/
+
+/*▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒*/
 module.exports = controller;

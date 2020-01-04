@@ -8,6 +8,9 @@ const MedioPago = sequelize.define('medioPago',{
         primaryKey:true,
         autoIncrement: true
     },
+    nombreMedioPago:{
+        type:Sequelize.STRING(100)
+    },
     descripcion:{
         type:Sequelize.TEXT
     }

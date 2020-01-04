@@ -11,8 +11,6 @@ router.get('/:idCliente/cuentas',controller.getCuenta);
 router.get('/:idCliente/pedidos',controller.getAllPedido);
 /*##################################### ClienteEnDomicilios API REST ####################################*/
 router.get('/:idCliente/domicilios',controller.getDomicilios);
-router.get('/:idCliente/domicilios/:idDomicilio',controller.getClienteEnDomicilio);
-router.post('/:idCliente/domicilios',controller.addDomicilio);
-router.put('/:idCliente/domicilios/:idDomicilio',controller.changeDomicilio);
-router.delete('/:idCliente/domicilios/:idDomicilio',controller.deleteDomicilio);
+router.get('/:idCliente/domicilios/:idDomicilio',controller.getDomicilioById);
+/*#######################################################################################################*/
 module.exports= router;

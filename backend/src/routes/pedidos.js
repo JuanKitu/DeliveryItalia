@@ -27,10 +27,10 @@ router.put('/:idPedido/items/:idItemPedido/precio',controller.calculatepriceItem
 router.put('/:idPedido/items/:idItemPedido/cantidad',controller.changeQuantity);
 
 /*--- Item pedido Pote API ---*/
-router.put('/:idPedido/items/:idItemPedido/potes',controller.addPote);
+router.post('/:idPedido/items/:idItemPedido/potes',controller.addPote);
 router.get('/:idPedido/items/:idItemPedido/potes',controller.getItemContent);
 /*--- Item pedido Producto API ---*/
-router.put('/:idPedido/items/:idItemPedido/productos',controller.addProducto);
+router.post('/:idPedido/items/:idItemPedido/productos',controller.addProducto);
 router.get('/:idPedido/items/:idItemPedido/productos',controller.getItemContent);
 
 

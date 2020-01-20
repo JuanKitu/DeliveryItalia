@@ -7,25 +7,6 @@ const Cuentas = require('../models/Cuentas.js');
 const Pedidos = require('../models/Pedidos.js');
 const ItemPedido = require('../models/ItemPedido.js');
 const Constante_pote = require('../models/Constante_pote.js');
-/*--- Query of pote ---*/
-controller.getAll = async (req, res) => {
-    const idCuenta = req.payload.sub;
-    try {
-        const cliente = Clientes.findOne({
-            idCuenta
-        });
-        
-        const pote = await Potes.findAll();
-        return res.json({
-            data: pote
-        });
-    } catch (error) {
-        console.log(error);
-        return res.json({
-            error: 'The server has been error'
-        });
-    };
-};
 /*--- Edit a pote ---*/
 controller.change = async (req, res) => {
     const idCuenta = req.payload.sub;

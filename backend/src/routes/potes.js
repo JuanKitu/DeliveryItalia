@@ -3,7 +3,6 @@ const router = Router();
 const controller = require('../controllers/potes.controller.js');
 
 
-router.get('/',controller.getAll);
 router.get('/:idPote',controller.getById);
 //router.delete('/:idPote',controller.delete);
 router.put('/:idPote',controller.change);;

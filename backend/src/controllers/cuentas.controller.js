@@ -4,13 +4,13 @@ const Cuentas = require('../models/Cuentas');
 
 const controller = {};
 /*--- Create a Cuenta ---*/
-controller.new = async (req, res) => {
+controller.new = async(req, res) => {
 
     const { email, password } = req.body;
 
     try {
         let salt = crypto.randomBytes(128).toString("base64");
-        crypto.pbkdf2(password, salt, 100, 64, 'sha512', async (err, derivedKey) => {
+        crypto.pbkdf2(password, salt, 100, 64, 'sha512', async(err, derivedKey) => {
             if (err) throw err;
             let cuenta = await Cuentas.create({
                 email,
@@ -31,7 +31,7 @@ controller.new = async (req, res) => {
     }
 };
 /*--- Query a Cuenta ---*/
-controller.getAll = async (req, res) => {
+controller.getAll = async(req, res) => {
     const idCuenta = req.payload.sub;
     try {
         cuentas = await Cuentas.findAll({
@@ -50,12 +50,12 @@ controller.getAll = async (req, res) => {
     }
 };
 /*--- Edit a Cuenta ---*/
-controller.change = async (req, res) => {
+controller.change = async(req, res) => {
     const idCuenta = req.payload.sub;
     const { password } = req.body;
     try {
         let salt = crypto.randomBytes(128).toString("base64");
-        crypto.pbkdf2(password, salt, 100, 64, 'sha512', async (err, derivedKey) => {
+        crypto.pbkdf2(password, salt, 100, 64, 'sha512', async(err, derivedKey) => {
             if (err) throw err;
             await Cuentas.update({
                 salt,
@@ -84,7 +84,7 @@ controller.change = async (req, res) => {
     }
 };
 /*--- Delete a Cuenta ---*/
-controller.delete = async (req, res) => {
+controller.delete = async(req, res) => {
     try {
         const idCuenta = req.payload.sub;
         const deleteRowCount = await Cuentas.destroy({
@@ -105,7 +105,7 @@ controller.delete = async (req, res) => {
     }
 };
 /*--- Find a Cuenta ---*/
-controller.getById = async (req, res) => {
+controller.getById = async(req, res) => {
     const idCuenta = req.payload.sub;
     try {
         cuenta = await Cuentas.findOne({
@@ -126,7 +126,7 @@ controller.getById = async (req, res) => {
 
 /*▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ Admin Cuentas API REST ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒*/
 /*--- Query a Cuenta ---*/
-controller.adminGetAll = async (req, res) => {
+controller.adminGetAll = async(req, res) => {
     try {
         cuentas = await Cuentas.findAll();
         return res.json({
@@ -140,19 +140,18 @@ controller.adminGetAll = async (req, res) => {
     }
 };
 /*--- Edit a Cuenta ---*/
-controller.adminChange = async (req, res) => {
+controller.adminChange = async(req, res) => {
     const { idCuenta } = req.params;
     const { email, password } = req.body;
     try {
         await Cuentas.update({
             email,
             password
-        },
-            {
-                where: {
-                    idCuenta
-                },
-            });
+        }, {
+            where: {
+                idCuenta
+            },
+        });
         const cuentas = await Cuentas.findOne({
             where: {
                 idCuenta
@@ -170,7 +169,7 @@ controller.adminChange = async (req, res) => {
     }
 };
 /*--- Delete a Cuenta ---*/
-controller.adminDelete = async (req, res) => {
+controller.adminDelete = async(req, res) => {
     try {
         const { idCuenta } = req.params;
         const deleteRowCount = await Cuentas.destroy({
@@ -191,7 +190,7 @@ controller.adminDelete = async (req, res) => {
     }
 };
 /*--- Find a Cuenta ---*/
-controller.adminGetById = async (req, res) => {
+controller.adminGetById = async(req, res) => {
     const { idCuenta } = req.params;
     try {
         cuenta = await Cuentas.findOne({
@@ -211,5 +210,58 @@ controller.adminGetById = async (req, res) => {
 };
 
 /*▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒*/
+controller.login = async(req, res) => {
+
+    const { email, password } = req.body;
+
+    let cuenta = await Cuentas.findOne({ where: { email } });
+    if (cuenta) {
+        crypto.pbkdf2(password, cuenta.salt, 100, 64, 'sha512', (err, derivedKey) => {
+            if (err) throw err;
+            if (derivedKey.toString('hex') == cuenta.password) {
+                let token = services.createToken(cuenta.idCuenta, cuenta.password);
+                return res.cookie('autorization', token).send({
+                    login: "ok"
+                });
+            } else {
+                return res.send({
+                    login: "contraseña incorrecta"
+                });
+            }
+        });
+    } else {
+        return res.send({
+            login: "usuario desconocido"
+        });
+    }
+};
+
+controller.register = (req, res) => {
+
+    const { email, password } = req.body;
+
+    let salt = crypto.randomBytes(128).toString("base64");
+    crypto.pbkdf2(password, salt, 100, 64, 'sha512', async(err, derivedKey) => {
+        if (err) throw err;
+        let cuenta = await Cuentas.create({
+            email,
+            password: derivedKey.toString('hex'),
+            salt,
+            userType: 1
+        });
+
+        let token = services.createToken(cuenta.idCuenta, cuenta.password);
+
+        return res.cookie('autorization', token).send({ data: 'ok' });
+    });
+};
+controller.logout = (req, res) => {
+    res.clearCookie("autorization");
+    res.send({ msg: 'success' });
+};
+
+
+
+
 
 module.exports = controller;

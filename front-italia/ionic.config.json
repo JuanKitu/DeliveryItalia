@@ -1,0 +1,8 @@
+{
+  "name": "front-italia",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular",
+  "id": "e4d9c47a"
+}

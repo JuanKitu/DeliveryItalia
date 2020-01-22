@@ -1,0 +1,85 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+    Registrarse
+    </ion-title>
+    
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- Acá va los datos que se deben registrar del cliente-->
+  <form [formGroup]="formularioCliente" (click)="submit()"> 
+  <ion-list>
+    <!-- Componente para ingresar nombre-->
+    <ion-item>
+      <ion-label>Nombres: </ion-label>
+      <ion-input formControlName="nombre" type="text"></ion-input>
+    </ion-item>
+    <!--Error al ingresar sombre-->
+    <div *ngFor="let error of errorMessages.name">
+      <ng-container *ngIf="nombre.hasError(error.type) && (nombre.dirty || nombre.touched)">
+        <small class="error-message">{{error.message}}</small>
+      </ng-container>
+    </div>
+   
+
+    <ion-item>
+      <ion-label>Apellidos: </ion-label>
+      <ion-input formControlName="apellido" type="text"></ion-input>
+    </ion-item>
+    <div *ngFor="let error of errorMessages.name">
+      <ng-container *ngIf="apellido.hasError(error.type) && (apellido.dirty || apellido.touched)">
+        <small class="error-message">{{error.message}}</small>
+      </ng-container>
+    </div>
+
+    <ion-item>
+      <ion-label stacked>Correo electrónico: </ion-label>
+      <ion-input  formControlName="email" type="email"></ion-input>
+    </ion-item>
+    <div *ngFor="let error of errorMessages.name">
+      <ng-container *ngIf="email.hasError(error.type) && (email.dirty || email.touched)">
+        <small class="error-message">{{error.message}}</small>
+      </ng-container>
+    </div>
+
+    <ion-item>
+      <ion-label>Contraseña: </ion-label>
+      <ion-input  formControlName="password" [type]="passwordType"></ion-input>
+      <ion-icon name="eye" clearOnEdit="false" [color]="passwordShown === true ? 'dark':'medium' " slot="end" (click)="togglePassword()"></ion-icon>
+    </ion-item>
+    <div *ngFor="let error of errorMessages.name">
+      <ng-container *ngIf="password.hasError(error.type) && (password.dirty || password.touched)">
+        <small class="error-message">{{error.message}}</small>
+      </ng-container>
+    </div>
+   
+
+    <ion-item>
+      <ion-label stacked>Confirme su contraseña: </ion-label>
+      <ion-input formControlName="passwordConfirmation" type="password"></ion-input>      
+    </ion-item>
+    <div *ngFor="let error of errorMessages.name">
+      <ng-container *ngIf="passwordConfirmation.hasError(error.type) && (passwordConfirmation.dirty || passwordConfirmation.touched)">
+        <small class="error-message">{{error.message}}</small>
+      </ng-container>
+    </div>
+
+  </ion-list>
+  </form>
+
+  <ion-row>
+    <ion-col width-50 style="text-align: center">
+      <ion-button  
+      color="primary" 
+      shape="round"
+      [disabled]="!formularioCliente.valid" 
+      type="submit">Create una cuenta</ion-button>
+    </ion-col>
+  </ion-row>
+
+    <!-- Aquí debería haber algun cartel de verificación de que las contraseñas son iguales-->
+    <!-- Se tendría que poder mostrar los caracteres como contraseña-->
+</ion-content>

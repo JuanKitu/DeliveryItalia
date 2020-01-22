@@ -34,6 +34,7 @@ CREATE TABLE sucursales(
     "idSucursal" serial NOT NULL,
     "numeroTelefono" INT,
     direccion VARCHAR(100) NOT NULL,
+    nombre VARCHAR(50),
     PRIMARY KEY("idSucursal")
 );
 
@@ -42,6 +43,7 @@ CREATE TABLE cuentas(
     email VARCHAR(50) NOT NULL,
     password VARCHAR NOT NULL,
     salt VARCHAR,
+    "userType" INT NOT NULL,
     PRIMARY KEY("idCuenta")
 );
 
@@ -64,31 +66,21 @@ CREATE TABLE calles(
 CREATE TABLE domicilios(
     "idDomicilio" SERIAL NOT NULL,
     "idCalle" INT NOT NULL,
+    "idCliente" INT NOT NULL
     numero INT NOT NULL,
     piso VARCHAR(50),
     "nroDepto" VARCHAR(10),
     referencias TEXT,
     "entreCalles" TEXT,
-    PRIMARY KEY("idDomicilio")
-    FOREIGN KEY("idCalle") REFERENCES calles
-);
-
-CREATE TABLE "clienteEnDomicilios"(
-    --que cliente se encuentra en que domicilio
-    "idCliente" int NOT NULL,
-    "idDomicilio" INT,
-    "nombrePilaDestinatario" VARCHAR(150),
-    "dniDestinatario" INT,
-    PRIMARY KEY("idCliente", "idDomicilio"),
-    FOREIGN KEY("idCliente") REFERENCES clientes,
-    FOREIGN KEY("idDomicilio") REFERENCES domicilios
+    PRIMARY KEY("idDomicilio"),
+    FOREIGN KEY("idCalle") REFERENCES calles,
+    FOREIGN KEY("idCliente") REFERENCES clientes
 );
 
 CREATE TABLE potes(
     "idPote" serial,
     tamanio REAL,
     cantidad INT DEFAULT 1,
-    "cantidadMaxima" INT,
     PRIMARY KEY("idPote")
 );
 
@@ -106,7 +98,6 @@ CREATE TABLE pedidos (
     "idPedido" SERIAL not null,
     "fechaPedido" TIMESTAMP WITH TIME ZONE not null,
     "montoTotal" REAL,
-    "montoPagaCliente" REAL not null,
     cuit BIGINT,
     "idDomicilio" INT,
     "idCliente" INT,
@@ -148,6 +139,7 @@ CREATE TABLE "estadoPedido"(
 CREATE TABLE "medioPago"(
     "idMedioPago" SERIAL NOT NULL,
     descripcion TEXT,
+    "nombreMedioPago" VARCHAR(50),
     PRIMARY KEY ("idMedioPago")
 );
 CREATE TABLE "precioDelivery"(

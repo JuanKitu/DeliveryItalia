@@ -1,32 +1,38 @@
 const Apodos = require('../models/Apodos.js');
 const controller = {};
 /*--- Create a apodo ---*/
-controller.new = async (req, res) => {
+controller.new = async(req, res) => {
     const { nombreCalle, idCalle } = req.body;
     try {
         const newApodo = await Apodos.create({
             nombreCalle,
             idCalle
         });
-        if(newApodo){
+        if (!nombreCalle || !idCalle) {
             return res.json({
-                message:'The Apodo has been created',
-                data:newApodo
+                errorNewPote: true
             });
-        } ;
+        }
+        if (newApodo) {
+            return res.json({
+                message: 'The Apodo has been created',
+                data: newApodo,
+                errorNewPote: false
+            });
+        };
     } catch (error) {
         console.log(error);
         return res.json({
-            error: 'The server has been error'
+            errorNewPote: true
         });
     }
 };
 /*--- Query a apodo ---*/
-controller.getAll = async (req, res) => {
+controller.getAll = async(req, res) => {
     try {
         apodos = await Apodos.findAll();
         return res.json({
-            data:apodos
+            data: apodos
         });
     } catch (error) {
         console.log(error);
@@ -36,27 +42,26 @@ controller.getAll = async (req, res) => {
     }
 };
 /*--- Edit a apodo ---*/
-controller.change = async (req, res) => {
-    const {idNombreCalle} = req.params;
+controller.change = async(req, res) => {
+    const { idNombreCalle } = req.params;
     const { nombreCalle, idCalle } = req.body;
     try {
         await Apodos.update({
             nombreCalle,
             idCalle
-        },
-        {
-            where:{
+        }, {
+            where: {
                 idNombreCalle
             },
         });
         const apodo = await Apodos.findOne({
-            where:{
+            where: {
                 idNombreCalle
             }
         });
         return res.json({
             message: 'The apodo has been changed',
-            data:apodo
+            data: apodo
         });
     } catch (error) {
         console.log(error);
@@ -66,7 +71,7 @@ controller.change = async (req, res) => {
     }
 };
 /*--- Delete a apodo ---*/
-controller.delete = async (req, res) => {
+controller.delete = async(req, res) => {
     try {
         const { idNombreCalle } = req.params;
         const deleteRowCount = await Apodos.destroy({
@@ -87,16 +92,16 @@ controller.delete = async (req, res) => {
     }
 };
 /*--- Find a apodo ---*/
-controller.getById = async (req, res) => {
+controller.getById = async(req, res) => {
     const { idNombreCalle } = req.params;
     try {
         const apodo = await Apodos.findOne({
-            where:{
+            where: {
                 idNombreCalle
             }
         });
         return res.json({
-            data:apodo
+            data: apodo
         });
     } catch (error) {
         console.log(error);

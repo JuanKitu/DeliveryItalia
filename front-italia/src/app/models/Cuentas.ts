@@ -6,6 +6,6 @@ export interface Cuentas{
     userType:string
 };
 export interface Login{
-    email?:string,
-    password?:string
+    email:string,
+    password:string
 };

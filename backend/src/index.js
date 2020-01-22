@@ -1,6 +1,6 @@
 //ayu dark theme
 const express = require('express');
-const {json} =require('express');
+const { json } = require('express');
 const morgan = require('morgan');
 const path = require('path');
 const cookieParser = require('cookie-parser');
@@ -10,8 +10,8 @@ const app = express();
 /*--- Settings ---*/
 console.log(new Date());
 app.set('views', path.join(__dirname, 'views'));
-app.set('json spaces',2);
-app.set('port',3000);
+app.set('json spaces', 2);
+app.set('port', 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.set('process', process);
@@ -33,7 +33,6 @@ const estadosPedidosRoutes = require('./routes/estadoPedidos.js')
 const medioPagosRoutes = require('./routes/medioPago.js');
 const cuentasRoutes = require('./routes/cuentas.js');
 const constante_potesRoutes = require('./routes/constante_pote.js')
-const usuariosRoutes = require('./routes/usuarios.js');
 const AuthToken = require('./middleware/authToken');
 const adminApodosRoutes = require('./routes/admin.apodos.js');
 const adminCallesRoutes = require('./routes/admin.calles.js');
@@ -56,41 +55,38 @@ app.use(AuthToken);
 
 /*######################################## User Routes ########################################*/
 
-app.use('/api/apodos',apodosRoutes);
-app.use('/api/calles',callesRoutes);
-app.use('/api/categoriagustos',categoriaGustoRoutes);
-app.use('/api/clientes',clientesRoutes);
-app.use('/api/cuentas',cuentasRoutes);
-app.use('/api/domicilios',domiciliosRoutes);
+app.use('/api/apodos', apodosRoutes);
+app.use('/api/calles', callesRoutes);
+app.use('/api/categoriagustos', categoriaGustoRoutes);
+app.use('/api/clientes', clientesRoutes);
+app.use('/api/cuentas', cuentasRoutes);
+app.use('/api/domicilios', domiciliosRoutes);
 //app.use('/api/estadopedidos',estadosPedidosRoutes);
-app.use('/api/gustos',gustosRoutes);
-app.use('/api/mediopagos',medioPagosRoutes);
-app.use('/api/pedidos',pedidosRoutes);//FALTA REVISAR LOS PERMISOS
-app.use('/api/potes',potesRoutes);//FALTA REVISAR LOS PERMISOS
-app.use('/api/productos',productosRoutes);
-app.use('/api/sucursales',sucursalesRuotes);
+app.use('/api/gustos', gustosRoutes);
+app.use('/api/mediopagos', medioPagosRoutes);
+app.use('/api/pedidos', pedidosRoutes); //FALTA REVISAR LOS PERMISOS
+app.use('/api/potes', potesRoutes); //FALTA REVISAR LOS PERMISOS
+app.use('/api/productos', productosRoutes);
+app.use('/api/sucursales', sucursalesRuotes);
 
 
-
-
-app.use('/api/usuarios',usuariosRoutes);
-app.use('/api/constante/potes',constante_potesRoutes);
+app.use('/api/constante/potes', constante_potesRoutes);
 /*####################################### Admin Routes ########################################*/
-app.use('/api/admin/apodos',adminApodosRoutes);
-app.use('/api/admin/calles',adminCallesRoutes);
-app.use('/api/admin/categoriagustos',adminCategoriaGustosRoutes);
-app.use('/api/admin/clientes',adminClientesRoutes);
-app.use('/api/admin/cuentas',adminCuentasRoutes);
-app.use('/api/admin/domicilios',adminDomiciliosRoutes);
-app.use('/api/admin/estadopedidos',adminEstadosPedidosRoutes);
-app.use('/api/admin/gustos',adminGustosRoutes);
-app.use('/api/admin/mediopagos',adminMedioPagoRoutes);
-app.use('/api/admin/pedidos',adminPedidosRoutes);
-app.use('/api/admin/pedidos',adminPotesRoutes);
-app.use('/api/admin/productos',adminProductosRoutes);
-app.use('/api/sucursales',adminSucursalesRoutes);
+app.use('/api/admin/apodos', adminApodosRoutes);
+app.use('/api/admin/calles', adminCallesRoutes);
+app.use('/api/admin/categoriagustos', adminCategoriaGustosRoutes);
+app.use('/api/admin/clientes', adminClientesRoutes);
+app.use('/api/admin/cuentas', adminCuentasRoutes);
+app.use('/api/admin/domicilios', adminDomiciliosRoutes);
+app.use('/api/admin/estadopedidos', adminEstadosPedidosRoutes);
+app.use('/api/admin/gustos', adminGustosRoutes);
+app.use('/api/admin/mediopagos', adminMedioPagoRoutes);
+app.use('/api/admin/pedidos', adminPedidosRoutes);
+app.use('/api/admin/pedidos', adminPotesRoutes);
+app.use('/api/admin/productos', adminProductosRoutes);
+app.use('/api/sucursales', adminSucursalesRoutes);
 /*#############################################################################################*/
 /*--- Starup ---*/
-app.listen(app.get('port'),()=>{
+app.listen(app.get('port'), () => {
     console.log(`Server on port: ${app.get('port')}`.magenta);
 });

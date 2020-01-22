@@ -8,7 +8,7 @@ router.post('/', controller.new);
 router.delete('/borrar', controller.delete);
 router.put('/editar', controller.change);
 router.post('/registrar', controller.register);
-router.get('/login', controller.login);
+router.post('/login', controller.login);
 router.get('/logout', controller.logout);
 
 module.exports = router;

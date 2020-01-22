@@ -1,0 +1,16 @@
+
+.error-message {
+  color: var(--ion-color-danger);
+}
+
+.welcome-card img {
+  max-height: 35vh;
+  overflow: hidden;
+}
+
+$colors: (
+  primary: #488aff,
+  secondary: #32db64,
+  danger: #f53d3d,
+  gray: #ccc
+)

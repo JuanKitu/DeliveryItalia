@@ -90,7 +90,7 @@ controller.delete = async (req, res) => {
 controller.getById = async (req, res) => {
     const { idNombreCalle } = req.params;
     try {
-        apodo = await Apodos.findOne({
+        const apodo = await Apodos.findOne({
             where:{
                 idNombreCalle
             }

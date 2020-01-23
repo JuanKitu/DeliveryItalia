@@ -1,9 +1,8 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>
-    Registrarse
+    Registrate
     </ion-title>
-    
   </ion-toolbar>
 </ion-header>
 
@@ -17,8 +16,8 @@
       <ion-label>Nombres: </ion-label>
       <ion-input formControlName="nombre" type="text"></ion-input>
     </ion-item>
-    <!--Error al ingresar sombre-->
-    <div *ngFor="let error of errorMessages.name">
+    <!--Error al ingresar nombre-->
+    <div *ngFor="let error of errorMessages.nombre">
       <ng-container *ngIf="nombre.hasError(error.type) && (nombre.dirty || nombre.touched)">
         <small class="error-message">{{error.message}}</small>
       </ng-container>
@@ -29,7 +28,7 @@
       <ion-label>Apellidos: </ion-label>
       <ion-input formControlName="apellido" type="text"></ion-input>
     </ion-item>
-    <div *ngFor="let error of errorMessages.name">
+    <div *ngFor="let error of errorMessages.apellido">
       <ng-container *ngIf="apellido.hasError(error.type) && (apellido.dirty || apellido.touched)">
         <small class="error-message">{{error.message}}</small>
       </ng-container>
@@ -39,7 +38,7 @@
       <ion-label stacked>Correo electrónico: </ion-label>
       <ion-input  formControlName="email" type="email"></ion-input>
     </ion-item>
-    <div *ngFor="let error of errorMessages.name">
+    <div *ngFor="let error of errorMessages.email">
       <ng-container *ngIf="email.hasError(error.type) && (email.dirty || email.touched)">
         <small class="error-message">{{error.message}}</small>
       </ng-container>
@@ -50,7 +49,7 @@
       <ion-input  formControlName="password" [type]="passwordType"></ion-input>
       <ion-icon name="eye" clearOnEdit="false" [color]="passwordShown === true ? 'dark':'medium' " slot="end" (click)="togglePassword()"></ion-icon>
     </ion-item>
-    <div *ngFor="let error of errorMessages.name">
+    <div *ngFor="let error of errorMessages.password">
       <ng-container *ngIf="password.hasError(error.type) && (password.dirty || password.touched)">
         <small class="error-message">{{error.message}}</small>
       </ng-container>
@@ -61,7 +60,7 @@
       <ion-label stacked>Confirme su contraseña: </ion-label>
       <ion-input formControlName="passwordConfirmation" type="password"></ion-input>      
     </ion-item>
-    <div *ngFor="let error of errorMessages.name">
+    <div *ngFor="let error of errorMessages.passwordConfirmation">
       <ng-container *ngIf="passwordConfirmation.hasError(error.type) && (passwordConfirmation.dirty || passwordConfirmation.touched)">
         <small class="error-message">{{error.message}}</small>
       </ng-container>

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+
+
 @Component({
   selector: 'app-horarios',
   templateUrl: './horarios.page.html',
@@ -7,7 +9,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HorariosPage implements OnInit {
 
-  constructor() { }
+  constructor() {}
+
 
   ngOnInit() {
   }

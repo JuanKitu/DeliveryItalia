@@ -1,23 +1,31 @@
-CREATE TABLE apodos (
-    "idNombreCalle" serial NOT NULL,
-    "nombreCalle" VARCHAR(100) NOT NULL,
-    "idCalle" INT NOT NULL,
-    PRIMARY KEY("idNombreCalle","idCalle"),
-    FOREIGN key("idCalle") REFERENCES calles
-);
 -- si no se pone las "" pgadmin toma automaticamente la cadena de texto totalmente en minusculas
-CREATE TABLE producto(
-    "idProducto" serial NOT NULL,
-    nombre VARCHAR(100) NOT NULL,
+CREATE TABLE cuentas(
+    "idCuenta" SERIAL NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    password VARCHAR NOT NULL,
+    salt VARCHAR,
+    "userType" INT,
+    PRIMARY KEY("idCuenta")
+);
+
+CREATE TABLE "medioPago"(
+    "idMedioPago" SERIAL NOT NULL,
     descripcion TEXT,
-    precio real NOT NULL,
-    PRIMARY KEY("idProducto")
+    PRIMARY KEY ("idMedioPago")
 );
 
 CREATE TABLE "categoriaGusto"(
     "idCategoria" serial NOT NULL,
     nombre VARCHAR(50) NOT NULL,
     PRIMARY KEY("idCategoria")
+);
+
+CREATE TABLE producto(
+    "idProducto" serial NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    precio real NOT NULL,
+    PRIMARY KEY("idProducto")
 );
 
 CREATE TABLE gustos(
@@ -37,13 +45,6 @@ CREATE TABLE sucursales(
     PRIMARY KEY("idSucursal")
 );
 
-CREATE TABLE cuentas(
-    "idCuenta" SERIAL NOT NULL,
-    email VARCHAR(50) NOT NULL,
-    password VARCHAR NOT NULL,
-    salt VARCHAR,
-    PRIMARY KEY("idCuenta")
-);
 
 CREATE TABLE clientes(
     "idCliente" serial NOT NULL,
@@ -52,13 +53,21 @@ CREATE TABLE clientes(
     apellido VARCHAR(50),
     "idCuenta" INT NOT NULL,
     PRIMARY KEY("idCliente"),
-    FOREIGN KEY("idCuenta") REFERENCES cuenta
+    FOREIGN KEY("idCuenta") REFERENCES cuentas
 );
 
 CREATE TABLE calles(
     "idCalle" serial NOT NULL,
     "nombreFormal" VARCHAR(100) NOT NULL,
-    PRIMARY KEY("idCalle"),
+    PRIMARY KEY("idCalle")
+);
+
+CREATE TABLE apodos (
+    "idNombreCalle" serial NOT NULL,
+    "nombreCalle" VARCHAR(100) NOT NULL,
+    "idCalle" INT NOT NULL,
+    PRIMARY KEY("idNombreCalle","idCalle"),
+    FOREIGN key("idCalle") REFERENCES calles
 );
 
 CREATE TABLE domicilios(
@@ -69,7 +78,7 @@ CREATE TABLE domicilios(
     "nroDepto" VARCHAR(10),
     referencias TEXT,
     "entreCalles" TEXT,
-    PRIMARY KEY("idDomicilio")
+    PRIMARY KEY("idDomicilio"),
     FOREIGN KEY("idCalle") REFERENCES calles
 );
 
@@ -116,7 +125,7 @@ CREATE TABLE pedidos (
     FOREIGN KEY("idCliente") REFERENCES clientes,
     FOREIGN KEY("idDomicilio") REFERENCES domicilios,
     FOREIGN KEY("idSucursal") REFERENCES sucursales,
-    FOREIGN KEY("idMedioPago") REFERENCES "medioPago"
+    FOREIGN KEY("idMedioPago") REFERENCES "medioPago",
     PRIMARY KEY("idPedido")
 );
 
@@ -145,11 +154,7 @@ CREATE TABLE "estadoPedido"(
     FOREIGN KEY("idPedido") REFERENCES pedidos
 );
 
-CREATE TABLE "medioPago"(
-    "idMedioPago" SERIAL NOT NULL,
-    descripcion TEXT,
-    PRIMARY KEY ("idMedioPago")
-);
+
 CREATE TABLE "precioDelivery"(
     "idPrecioDelivery" SERIAL NOT NULL,
     "idSucursal" INT NOT NULL,

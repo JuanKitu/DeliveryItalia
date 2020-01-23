@@ -211,7 +211,6 @@ controller.adminGetById = async(req, res) => {
 
 /*▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒*/
 controller.login = async(req, res) => {
-
     const { email, password } = req.body;
 
     let cuenta = await Cuentas.findOne({ where: { email } });

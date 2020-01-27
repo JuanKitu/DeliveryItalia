@@ -4,6 +4,7 @@ const { json } = require('express');
 const morgan = require('morgan');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const cors = require('cors')
 colors = require('colors');
 const app = express();
 
@@ -17,7 +18,6 @@ app.set('view engine', 'ejs');
 app.set('process', process);
 app.use(cookieParser());
 process.env.TZ = 'UTC-3';
-
 /*--- importing routes ---*/
 const productosRoutes = require('./routes/productos.js');
 const categoriaGustoRoutes = require('./routes/categoriaGusto.js');
@@ -51,6 +51,15 @@ const adminSucursalesRoutes = require('./routes/admin.sucursales.js');
 app.use(morgan('dev'));
 app.use(json());
 app.use(AuthToken);
+
+// Configurar cabeceras y cors
+const corsOptions = {
+    origin: 'http://localhost:8100',
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  };
+app.use(cors(corsOptions))
+
+
 /*--- Routes ---*/
 
 /*######################################## User Routes ########################################*/

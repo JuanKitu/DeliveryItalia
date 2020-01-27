@@ -42,9 +42,21 @@ CREATE TABLE sucursales(
     "idSucursal" serial NOT NULL,
     "numeroTelefono" INT,
     direccion VARCHAR(100) NOT NULL,
+    nombre VARCHAR(50),
     PRIMARY KEY("idSucursal")
 );
 
+<<<<<<< HEAD
+=======
+CREATE TABLE cuentas(
+    "idCuenta" SERIAL NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    password VARCHAR NOT NULL,
+    salt VARCHAR,
+    "userType" INT NOT NULL,
+    PRIMARY KEY("idCuenta")
+);
+>>>>>>> 67c27e60f2264f17adf5a4ba4f5d2ba37e43c063
 
 CREATE TABLE clientes(
     "idCliente" serial NOT NULL,
@@ -73,12 +85,14 @@ CREATE TABLE apodos (
 CREATE TABLE domicilios(
     "idDomicilio" SERIAL NOT NULL,
     "idCalle" INT NOT NULL,
+    "idCliente" INT NOT NULL
     numero INT NOT NULL,
     piso VARCHAR(50),
     "nroDepto" VARCHAR(10),
     referencias TEXT,
     "entreCalles" TEXT,
     PRIMARY KEY("idDomicilio"),
+<<<<<<< HEAD
     FOREIGN KEY("idCalle") REFERENCES calles
 );
 
@@ -91,13 +105,16 @@ CREATE TABLE "clienteEnDomicilios"(
     PRIMARY KEY("idCliente", "idDomicilio"),
     FOREIGN KEY("idCliente") REFERENCES clientes,
     FOREIGN KEY("idDomicilio") REFERENCES domicilios
+=======
+    FOREIGN KEY("idCalle") REFERENCES calles,
+    FOREIGN KEY("idCliente") REFERENCES clientes
+>>>>>>> 67c27e60f2264f17adf5a4ba4f5d2ba37e43c063
 );
 
 CREATE TABLE potes(
     "idPote" serial,
     tamanio REAL,
     cantidad INT DEFAULT 1,
-    "cantidadMaxima" INT,
     PRIMARY KEY("idPote")
 );
 
@@ -115,7 +132,6 @@ CREATE TABLE pedidos (
     "idPedido" SERIAL not null,
     "fechaPedido" TIMESTAMP WITH TIME ZONE not null,
     "montoTotal" REAL,
-    "montoPagaCliente" REAL not null,
     cuit BIGINT,
     "idDomicilio" INT,
     "idCliente" INT,
@@ -154,7 +170,16 @@ CREATE TABLE "estadoPedido"(
     FOREIGN KEY("idPedido") REFERENCES pedidos
 );
 
+<<<<<<< HEAD
 
+=======
+CREATE TABLE "medioPago"(
+    "idMedioPago" SERIAL NOT NULL,
+    descripcion TEXT,
+    "nombreMedioPago" VARCHAR(50),
+    PRIMARY KEY ("idMedioPago")
+);
+>>>>>>> 67c27e60f2264f17adf5a4ba4f5d2ba37e43c063
 CREATE TABLE "precioDelivery"(
     "idPrecioDelivery" SERIAL NOT NULL,
     "idSucursal" INT NOT NULL,

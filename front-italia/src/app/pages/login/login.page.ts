@@ -54,8 +54,8 @@ export class LoginPage {
 
   public submit(){    //En el response hay que cambiar el tipo
     this._cuentaServicio.login(this.email,this.password).subscribe(
-        function (response){
-          console.log(response);
-        });
+    function (response){
+   console.log(response);
+   });
   }
 }

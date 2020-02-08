@@ -12,7 +12,7 @@ export class CuentaServicioService {
    }
   
    public login(email, password): Observable<string>{
-      return this.http.post<string>('http://localhost:3000/api/cuentas/login/',{email,password}) 
+      return this.http.post<string>('http://localhost:3000/api/cuentas/login/',{email, password}) 
       // Esto devuelve el observable que devuelve el valor 
    }        //Este observable tiene un método llamado suscribe que toma una función que resuelve lo que se haga una vez que llega la respuesta del server
 

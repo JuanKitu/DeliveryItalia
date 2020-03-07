@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
-import { CuentaServicioService } from '../../services/cuenta-servicio.service';
 import { Login, Cuentas } from '../../models/Cuentas';
+import { LoginService } from 'src/app/services/login-service/login.service';
 
 @Component({
   selector: 'login',
@@ -41,21 +41,16 @@ export class LoginPage {
     }
   }
 
-  constructor(public formBuilder: FormBuilder, private _cuentaServicio: CuentaServicioService) {
+  constructor(public formBuilder: FormBuilder, private loginService: LoginService) {
   }
 
-  get email(){
-    return this.formularioLogin.get('email').toString();
-  }
-  
-  get password(){
-    return this.formularioLogin.get('password').toString();
+  registrarUsuario(value){
+    this.loginService.registarUsuario(value)
+        .subscribe(
+        (pedidos) => {
+       },
+        (error) => {console.log(error);}
+     )
   }
 
-  public submit(){    //En el response hay que cambiar el tipo
-    this._cuentaServicio.login(this.email,this.password).subscribe(
-    function (response){
-   console.log(response);
-   });
-  }
 }

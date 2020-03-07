@@ -6,7 +6,7 @@
 
 <ion-content>
 
-  <form [formGroup]="formularioLogin" (click)="submit()">
+  <form [formGroup]="formularioLogin" (ngSubmit)="registrarUsuario(formularioLogin.value)">
   <ion-list>
     <ion-item>
       <ion-label position="floating">Correo electrónico: </ion-label>
@@ -18,25 +18,10 @@
     <ion-input formControlName="password" [type]="passwordType"></ion-input>
     <ion-icon name="eye" clearOnEdit="false" [color]="passwordShown === true ? 'dark':'medium' " slot="end" (click)="togglePassword()"></ion-icon>
   </ion-item> 
-  
+  <ion-button color="success" class="submit-btn" expand="block" type="submit" [disabled]="!formularioLogin.valid || loading">{{ loading ? 'Ingresando...' : 'Ingresar' }}</ion-button>
   </ion-list>
 </form>
 
-<ion-row>
-  <ion-col width-50 style="text-align: center">
-    <ion-button  
-    color="primary" 
-    shape="round"
-    [disabled]="!formularioLogin.valid" 
-    (click)="submit()">Ingresa a tu cuenta</ion-button>
-  </ion-col>
-</ion-row>
-
-<ion-row>
-
-
-
-</ion-row>
 
 </ion-content>
 

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductosPage } from '../productos/productos.page';
 import { ModalController } from '@ionic/angular';
-
+import {PedidosService} from './../../services/pedidos-service/pedidos.service'
 @Component({
   selector: 'app-pedido',
   templateUrl: './pedido.page.html',
@@ -9,9 +9,17 @@ import { ModalController } from '@ionic/angular';
 })
 export class PedidoPage implements OnInit {
 
-  constructor(private modalController: ModalController) { }
+  pedidos : any;
+
+  constructor(private modalController: ModalController,private pedidosService: PedidosService) { }
 
   ngOnInit() {
+    this.pedidosService.obtenerPedidos()
+        .subscribe(
+        (pedidos) => {this.pedidos= pedidos;
+        console.log(pedidos);},
+        (error) => {console.log(error);}
+     )
   }
 
   async presentModal() {

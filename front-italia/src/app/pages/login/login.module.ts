@@ -4,7 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginPageRoutingModule } from './login-routing.module';
-import { CuentaServicioService } from '../../services/cuenta-servicio.service'
+import { LoginService } from '../../services/login-service/login.service'
 
 import { LoginPage } from './login.page';
 
@@ -17,6 +17,6 @@ import { LoginPage } from './login.page';
     LoginPageRoutingModule
   ],
   declarations: [LoginPage],
-  providers: [CuentaServicioService]
+  providers: [LoginService]
 })
 export class LoginPageModule {}

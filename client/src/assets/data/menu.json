@@ -1,0 +1,21 @@
+[{
+        "title": "Mi cuenta",
+        "url": "/ensayo",
+        "icon": "people"
+    },
+    {
+        "title": "Mis direcciones",
+        "url": "/ensayo/lista",
+        "icon": "home"
+    },
+    {
+        "title": "Mis Pedidos",
+        "url": "/ensayo/archivados",
+        "icon": "cart"
+    },
+    {
+        "title": "Horarios",
+        "url": "/usuarios",
+        "icon": "time"
+    }
+]
